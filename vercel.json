@@ -1,0 +1,4 @@
+{
+  "buildCommand": "npm run lint && next build",
+  "outputDirectory": ".next"
+}
