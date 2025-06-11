@@ -1,3 +1,36 @@
 {
-  
+  "common": {
+    "open": "Open",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "drafts": {
+    "drafts": "Drafts",
+    "createDraft": "Create Draft",
+    "loading": "Loading...",
+    "noDrafts": "No drafts found",
+    "random": "Random",
+    "bans": "Bans",
+    "loserBans": "Loser Bans",
+    "repick": "Repick",
+    "confirmDelete": "Delete Draft",
+    "deleteWarning": "Are you sure you want to delete draft {name}?",
+    "password": "Password",
+    "enterPassword": "Enter password",
+    "name": "Name",
+    "enterName": "Enter draft name",
+    "game": "Game",
+    "error": "Error",
+    "success": "Success",
+    "draftCreated": "Draft created successfully",
+    "createError": "Error creating draft",
+    "unknownError": "An unknown error occurred",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "games": {
+    "coe5": "Conquest of Elysium 5",
+    "civ6": "Civilization VI"
+  }
 }

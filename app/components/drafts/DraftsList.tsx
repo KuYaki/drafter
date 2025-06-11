@@ -1,9 +1,10 @@
 'use client';
 
-import { Card, Message, Loader } from 'semantic-ui-react';
+import { Message, Loader } from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
 import DraftCard from './DraftCard';
 import type { Draft } from '@/types/draft';
+import CardGroup from '@/app/components/shared/ui/CardGroup';
 
 interface DraftsListProps {
   drafts: Draft[];
@@ -40,10 +41,10 @@ export default function DraftsList({
   }
 
   return (
-    <Card.Group stackable>
+    <CardGroup itemsPerRow={4 as const} doubling stackable>
       {drafts.map((draft) => (
         <DraftCard key={draft.name} draft={draft} onDelete={onDeleteDraft} />
       ))}
-    </Card.Group>
+    </CardGroup>
   );
 }

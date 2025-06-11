@@ -1,1 +1,36 @@
-{}
+{
+  "common": {
+    "open": "Abrir",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "drafts": {
+    "drafts": "Borradores",
+    "createDraft": "Crear borrador",
+    "loading": "Cargando...",
+    "noDrafts": "No se encontraron borradores",
+    "random": "Aleatorio",
+    "bans": "Bans",
+    "loserBans": "Bans perdedores",
+    "repick": "Reelegir",
+    "confirmDelete": "Eliminar borrador",
+    "deleteWarning": "¿Estás seguro de que quieres eliminar el borrador {name}?",
+    "password": "Contraseña",
+    "enterPassword": "Introduce la contraseña",
+    "name": "Nombre",
+    "enterName": "Introduce el nombre del borrador",
+    "game": "Juego",
+    "error": "Error",
+    "success": "Éxito",
+    "draftCreated": "Borrador creado con éxito",
+    "createError": "Error al crear el borrador",
+    "unknownError": "Ocurrió un error desconocido",
+    "cancel": "Cancelar",
+    "create": "Crear"
+  },
+  "games": {
+    "coe5": "Conquest of Elysium 5",
+    "civ6": "Civilization VI"
+  }
+}

@@ -1,1 +1,36 @@
-{}
+{
+  "common": {
+    "open": "Открыть",
+    "delete": "Удалить",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить"
+  },
+  "drafts": {
+    "drafts": "Драфты",
+    "createDraft": "Создать драфт",
+    "loading": "Загрузка...",
+    "noDrafts": "Драфты не найдены",
+    "random": "Рандом",
+    "bans": "Баны",
+    "loserBans": "Баны проигравших",
+    "repick": "Перевыбор",
+    "confirmDelete": "Удаление драфта",
+    "deleteWarning": "Вы уверены, что хотите удалить драфт {name}?",
+    "password": "Пароль",
+    "enterPassword": "Введите пароль",
+    "name": "Название",
+    "enterName": "Введите название драфта",
+    "game": "Игра",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "draftCreated": "Драфт успешно создан",
+    "createError": "Ошибка при создании драфта",
+    "unknownError": "Произошла неизвестная ошибка",
+    "cancel": "Отмена",
+    "create": "Создать"
+  },
+  "games": {
+    "coe5": "Conquest of Elysium 5",
+    "civ6": "Civilization VI"
+  }
+}

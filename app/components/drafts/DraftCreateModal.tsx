@@ -110,9 +110,7 @@ export default function DraftCreateModal({
         setFormError(result.error || t('createError'));
       }
     } catch (err) {
-      setFormError(
-        err instanceof Error ? err.message : t('unknownError')
-      );
+      setFormError(err instanceof Error ? err.message : t('unknownError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -126,12 +124,7 @@ export default function DraftCreateModal({
   }));
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={onClose}
-      size="small"
-      dimmer="blurring"
-    >
+    <Modal open={isOpen} onClose={onClose} size="small" dimmer="blurring">
       <Modal.Header>{t('createDraft')}</Modal.Header>
       <Modal.Content>
         <Form
@@ -191,7 +184,7 @@ export default function DraftCreateModal({
 
           <Form.Group widths="equal">
             <Form.Input
-              label={t('looseBans')}
+              label={t('loserBans')}
               name="loose_bans"
               type="number"
               min="0"

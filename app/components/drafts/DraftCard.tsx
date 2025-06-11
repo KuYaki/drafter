@@ -2,12 +2,14 @@
 
 import {
   Card,
+  Image,
   Button,
   Modal,
   Form,
   Message,
   Label,
   LabelDetail,
+  Icon,
 } from 'semantic-ui-react';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -57,52 +59,58 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
 
   return (
     <>
-      <Card fluid color={isDark ? 'blue' : 'teal'}>
+      <Card style={{ overflow: 'hidden' }} as="a" fluid>
+        <Image src={`/images/games/${draft.game_id}/header.jpg`} />
         <Card.Content>
           <Card.Header>{draft.name}</Card.Header>
           <Card.Meta>{tg(draft.game_id)}</Card.Meta>
           <Card.Description>
-            {draft.params.random && (
-              <Label color="yellow">
+            {draft.params.random ? (
+              <Label color="orange" style={{ margin: '0.2rem' }}>
                 {t('random')}
                 <LabelDetail style={{ whiteSpace: 'nowrap' }}>
                   {'✯ ' + draft.params.random}
                 </LabelDetail>
               </Label>
-            )}
-            {draft.params.bans && (
-              <Label color="red">
+            ) : null}
+            {draft.params.bans ? (
+              <Label color="red" style={{ margin: '0.2rem' }}>
                 {t('bans')}
                 <LabelDetail style={{ whiteSpace: 'nowrap' }}>
                   {'✯ ' + draft.params.bans}
                 </LabelDetail>
               </Label>
-            )}
-            {draft.params.loose_bans && (
-              <Label color="blue">
-                {t('looseBans')}
+            ) : null}
+            {draft.params.loose_bans ? (
+              <Label color="blue" style={{ margin: '0.2rem' }}>
+                {t('loserBans')}
                 <LabelDetail style={{ whiteSpace: 'nowrap' }}>
                   {'✯ ' + draft.params.loose_bans}
                 </LabelDetail>
               </Label>
-            )}
-            {draft.params.repick && (
-              <Label color="green">
+            ) : null}
+            {draft.params.repick ? (
+              <Label color="green" style={{ margin: '0.2rem' }}>
                 {t('repick')}
                 <LabelDetail style={{ whiteSpace: 'nowrap' }}>
                   {'✯ ' + draft.params.repick}
                 </LabelDetail>
               </Label>
-            )}
+            ) : null}
           </Card.Description>
         </Card.Content>
         <Card.Content extra>
-          <div className="ui two buttons">
-            <Button basic color="green">
-              {tc('open')}
-            </Button>
+          <div className="flex items-center gap-[1rem]">
             <Button
               basic
+              compact
+              color="green"
+              icon={draft.password ? 'lock' : 'lock open'}
+              content={tc('open')}
+            />
+            <Button
+              basic
+              compact
               color="red"
               onClick={() => setIsDeleteModalOpen(true)}
             >
@@ -114,16 +122,19 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
 
       <Modal
         size="tiny"
+        className={isDark ? 'dark' : ''}
+        closeIcon
         open={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         dimmer="blurring"
       >
         <Modal.Header>{t('confirmDelete')}</Modal.Header>
         <Modal.Content>
-          <p>{t('deleteWarning', { name: draft.name })}</p>
+          <p style={{ color: 'black', marginBottom: '0.5rem' }}>
+            {t('deleteWarning', { name: draft.name })}
+          </p>
           <Form>
             <Form.Input
-              label={t('password')}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -134,17 +145,19 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button negative onClick={() => setIsDeleteModalOpen(false)}>
-            {tc('cancel')}
-          </Button>
-          <Button
-            positive
-            onClick={handleDelete}
-            loading={isDeleting}
-            disabled={isDeleting || !password}
-          >
-            {tc('confirm')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setIsDeleteModalOpen(false)}>
+              {tc('cancel')}
+            </Button>
+            <Button
+              negative
+              onClick={handleDelete}
+              loading={isDeleting}
+              disabled={isDeleting}
+            >
+              {tc('confirm')}
+            </Button>
+          </div>
         </Modal.Actions>
       </Modal>
     </>

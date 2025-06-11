@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Header, Segment } from 'semantic-ui-react';
+import { Segment } from 'semantic-ui-react';
 import { useTheme } from '@/lib/theme/ThemeContext';
 import { DIMENS } from '@/constants/dimens';
 import DraftsView from '@/app/components/drafts/DraftsView';
@@ -18,10 +18,7 @@ export default function HomeLayout({}: HomeLayoutProps) {
           marginBottom: DIMENS.common.bottomSpacing,
         }}
       >
-        <Container>
-          <Header as="h1" inverted={isDark}>Drafter</Header>
-          <DraftsView />
-        </Container>
+        <DraftsView />
       </Segment>
     </>
   );
