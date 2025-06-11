@@ -51,8 +51,8 @@ export default async function RootLayout({
   if (!i18n.locales.includes(locale as any)) notFound();
 
   const messages = (await import(`@/locales/${locale}.json`)).default;
-  const cookieStore = await cookies();
-  const theme = (cookieStore.get('theme')?.value || 'light') as
+  const cookieStore = cookies();
+  const theme = (cookieStore.get('drafter_theme')?.value || 'light') as
     | 'light'
     | 'dark';
   return (
