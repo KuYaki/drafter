@@ -198,7 +198,7 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
           </Segment>
         </Modal.Content>
         <Modal.Actions>
-          <Button onClick={() => setIsDeleteModalOpen(false)}>
+          <Button inverted={isDark} onClick={() => setIsDeleteModalOpen(false)}>
             {tc('cancel')}
           </Button>
           <Button
@@ -240,7 +240,7 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
           </Segment>
         </Modal.Content>
         <Modal.Actions>
-          <Button onClick={() => setIsOpenModalOpen(false)}>
+          <Button inverted={isDark} onClick={() => setIsOpenModalOpen(false)}>
             {tc('cancel')}
           </Button>
           <Button positive onClick={handleOpenWithPassword}>

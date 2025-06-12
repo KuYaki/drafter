@@ -236,7 +236,7 @@ export default function DraftCreateModal({
         </Segment>
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={onClose} disabled={isSubmitting}>
+        <Button inverted={isDark} onClick={onClose} disabled={isSubmitting}>
           {t('cancel')}
         </Button>
         <Button

@@ -22,21 +22,25 @@ interface PlayersListProps {
   players: Player[];
   gameId: GameId;
   userId?: string | null;
+  draftName?: string;
   loading: boolean;
+  updating: boolean;
   error: string | null;
   onColorChange: (params: {
     playerId: string;
     color: PlayerColor;
   }) => Promise<void>;
   onJoin: (params: { name: string; password: string }) => Promise<void>;
-  onLeave: (params: { playerId: string }) => Promise<void>;
+  onLeave: () => Promise<void>;
 }
 
 export default function PlayersList({
   players,
   gameId,
   userId,
+  draftName,
   loading,
+  updating,
   error,
   onColorChange,
   onJoin,
@@ -64,10 +68,12 @@ export default function PlayersList({
     <>
       <div className="flex items-center justify-between gap-[1rem] m-[1rem]">
         <Header inverted={isDark} style={{ margin: 0 }}>
-          {t('players')}
+          {t('players') + (draftName ? ' ' + draftName : '')}
         </Header>
         <Button
           content={joinable ? t('join') : t('leave')}
+          disabled={updating}
+          loading={updating}
           primary={joinable}
           basic={!joinable}
           inverted={isDark && !joinable}
@@ -127,16 +133,14 @@ export default function PlayersList({
         <Modal.Actions>
           <Button
             onClick={() => {
-              setOpenLeaveModal(false);
+              setOpenJoinModal(false);
             }}
             inverted={isDark}
             content={tc('cancel')}
           />
           <Button
             onClick={() => {
-              userId
-                ? onLeave({ playerId: userId })
-                : onJoin({ name, password });
+              onJoin({ name, password });
               setOpenJoinModal(false);
             }}
             primary
@@ -167,7 +171,7 @@ export default function PlayersList({
           />
           <Button
             onClick={() => {
-              userId && onLeave({ playerId: userId });
+              userId && onLeave();
               setOpenLeaveModal(false);
             }}
             inverted={isDark}

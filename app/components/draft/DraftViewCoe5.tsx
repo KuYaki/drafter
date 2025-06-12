@@ -20,6 +20,7 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
     players,
     user,
     loading,
+    updating,
     error: playersError,
     handleJoin,
     handleLeave,
@@ -39,7 +40,9 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
         players={players}
         gameId={draft.game_id}
         userId={user?.id}
+        draftName={draft.name}
         loading={loading}
+        updating={updating}
         error={playersError}
         onColorChange={handleSetColor}
         onJoin={handleJoin}

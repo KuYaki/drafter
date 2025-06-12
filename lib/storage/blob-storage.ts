@@ -34,10 +34,12 @@ export async function saveDraftToBlob(draft: Draft): Promise<boolean> {
 export async function deleteDraftFromBlob(draftId: string): Promise<boolean> {
   try {
     // Create blob path for this draft
-    const blobPath = `${DRAFTS_BLOB_PREFIX}${draftId}.json`;
+    const draftPath = `${DRAFTS_BLOB_PREFIX}${draftId}.json`;
+    const playersPath = `${PLAYERS_BLOB_PREFIX}${draftId}.json`;
 
     // Delete the blob
-    await del(blobPath);
+    await del(draftPath);
+    await del(playersPath);
 
     return true;
   } catch (error) {
@@ -133,7 +135,15 @@ export async function getPlayersFromBlobByDraftId(
     const { url } = await head(blobPath);
 
     // Fetch the blob content
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
+    });
     if (!response.ok) {
       throw new Error(
         `Failed to fetch draft: ${response.status} ${response.statusText}`

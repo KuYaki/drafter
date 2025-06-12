@@ -2,19 +2,19 @@ import { z } from 'zod';
 import { CharacterIdSchema } from './character';
 
 export const colors = [
-  'white',
   'red',
-  'orange',
-  'yellow',
-  'olive',
-  'green',
-  'teal',
   'blue',
-  'violet',
-  'purple',
-  'pink',
+  'green',
   'brown',
+  'orange',
+  'teal',
+  'purple',
+  'olive',
+  'violet',
+  'yellow',
+  'pink',
   'grey',
+  'white',
   'black',
 ] as const;
 
