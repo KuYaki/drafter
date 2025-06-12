@@ -1,7 +1,9 @@
 import { put, del, list, head } from '@vercel/blob';
 import type { Draft } from '@/types/draft';
+import { Player } from '@/types/player';
 
 const DRAFTS_BLOB_PREFIX = 'drafts/';
+const PLAYERS_BLOB_PREFIX = 'players/';
 
 /**
  * Save a draft to Blob Storage
@@ -10,15 +12,14 @@ const DRAFTS_BLOB_PREFIX = 'drafts/';
 export async function saveDraftToBlob(draft: Draft): Promise<boolean> {
   try {
     // Create a blob path for this draft
-    const blobPath = `${DRAFTS_BLOB_PREFIX}${draft.name}.json`;
+    const blobPath = `${DRAFTS_BLOB_PREFIX}${draft.id}.json`;
 
     // Save draft as JSON
-    const blob = await put(blobPath, JSON.stringify(draft), {
+    await put(blobPath, JSON.stringify(draft), {
       contentType: 'application/json',
       access: 'public', // or 'private' depending on security requirements
     });
 
-    console.log(`Draft saved to blob: ${blob.url}`);
     return true;
   } catch (error) {
     console.error('Error saving draft to Blob Storage:', error);
@@ -28,17 +29,16 @@ export async function saveDraftToBlob(draft: Draft): Promise<boolean> {
 
 /**
  * Delete a draft from Blob Storage
- * @param draftName Name of the draft to delete
+ * @param draftId ID of the draft to delete
  */
-export async function deleteDraftFromBlob(draftName: string): Promise<boolean> {
+export async function deleteDraftFromBlob(draftId: string): Promise<boolean> {
   try {
     // Create blob path for this draft
-    const blobPath = `${DRAFTS_BLOB_PREFIX}${draftName}.json`;
+    const blobPath = `${DRAFTS_BLOB_PREFIX}${draftId}.json`;
 
     // Delete the blob
     await del(blobPath);
 
-    console.log(`Draft deleted: ${draftName}`);
     return true;
   } catch (error) {
     console.error('Error deleting draft from Blob Storage:', error);
@@ -87,14 +87,12 @@ export async function getAllDraftsFromBlob(): Promise<Draft[]> {
 
 /**
  * Get a specific draft from Blob Storage
- * @param draftName Name of the draft to get
+ * @param draftId ID of the draft to get
  */
-export async function getDraftFromBlob(
-  draftName: string
-): Promise<Draft | null> {
+export async function getDraftFromBlob(draftId: string): Promise<Draft | null> {
   try {
     // Create blob path for this draft
-    const blobPath = `${DRAFTS_BLOB_PREFIX}${draftName}.json`;
+    const blobPath = `${DRAFTS_BLOB_PREFIX}${draftId}.json`;
 
     // Check if the blob exists
     try {
@@ -119,7 +117,56 @@ export async function getDraftFromBlob(
     const draft = await response.json();
     return draft as Draft;
   } catch (error) {
-    console.error(`Error getting draft ${draftName} from Blob Storage:`, error);
+    console.error(`Error getting draft ${draftId} from Blob Storage:`, error);
     return null;
+  }
+}
+
+export async function getPlayersFromBlobByDraftId(
+  draftId: string
+): Promise<Player[]> {
+  try {
+    // Create blob path for this draft
+    const blobPath = `${PLAYERS_BLOB_PREFIX}${draftId}.json`;
+
+    // Get the blob URL
+    const { url } = await head(blobPath);
+
+    // Fetch the blob content
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch draft: ${response.status} ${response.statusText}`
+      );
+    }
+
+    // Parse the JSON content
+    const players = await response.json();
+    return players as Player[];
+  } catch (error) {
+    console.error(`Error getting draft ${draftId} from Blob Storage:`, error);
+    return [];
+  }
+}
+
+export async function setPlayersToBlobByDraftId(
+  draftId: string,
+  players: Player[]
+): Promise<boolean> {
+  try {
+    // Create blob path for this draft
+    const blobPath = `${PLAYERS_BLOB_PREFIX}${draftId}.json`;
+
+    // Save draft as JSON
+    await put(blobPath, JSON.stringify(players), {
+      contentType: 'application/json',
+      allowOverwrite: true,
+      access: 'public', // or 'private' depending on security requirements
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error saving players to Blob Storage:', error);
+    return false;
   }
 }

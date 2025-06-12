@@ -1,7 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Form, Modal, Message, Dropdown } from 'semantic-ui-react';
+import {
+  Button,
+  Form,
+  Modal,
+  Message,
+  Dropdown,
+  Segment,
+} from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from '@/lib/theme/ThemeContext';
 import { GameId, gameIds } from '@/types/draft';
@@ -17,7 +24,7 @@ interface DraftCreateModalProps {
     params: {
       random: number;
       bans: number;
-      loose_bans: number;
+      loser_bans: number;
       repick: number;
     };
   }) => Promise<{ success: boolean; error?: string }>;
@@ -41,7 +48,7 @@ export default function DraftCreateModal({
     params: {
       random: 0,
       bans: 0,
-      loose_bans: 0,
+      loser_bans: 0,
       repick: 0,
     },
   });
@@ -98,7 +105,7 @@ export default function DraftCreateModal({
           params: {
             random: 0,
             bans: 0,
-            loose_bans: 0,
+            loser_bans: 0,
             repick: 0,
           },
         });
@@ -124,99 +131,109 @@ export default function DraftCreateModal({
   }));
 
   return (
-    <Modal open={isOpen} onClose={onClose} size="small" dimmer="blurring">
+    <Modal
+      basic
+      closeIcon
+      open={isOpen}
+      onClose={onClose}
+      size="small"
+      dimmer="blurring"
+    >
       <Modal.Header>{t('createDraft')}</Modal.Header>
       <Modal.Content>
-        <Form
-          onSubmit={handleSubmit}
-          error={!!formError}
-          success={!!formSuccess}
-          loading={isSubmitting}
-        >
-          <Form.Input
-            label={t('name')}
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder={t('enterName')}
-            required
-          />
-          <Form.Input
-            label={t('password')}
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder={t('enterPassword')}
-            required
-          />
-          <Form.Field>
-            <label>{t('game')}</label>
-            <Dropdown
-              fluid
-              selection
-              options={gameOptions}
-              value={formData.game_id}
-              onChange={handleGameChange}
-            />
-          </Form.Field>
-
-          <Form.Group widths="equal">
+        <Segment inverted={isDark}>
+          <Form
+            inverted={isDark}
+            onSubmit={handleSubmit}
+            error={!!formError}
+            success={!!formSuccess}
+            loading={isSubmitting}
+          >
             <Form.Input
-              label={t('random')}
-              name="random"
-              type="number"
-              min="0"
-              max="10"
-              value={formData.params.random}
-              onChange={handleParamChange}
+              label={t('name')}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder={t('enterName')}
+              required
             />
             <Form.Input
-              label={t('bans')}
-              name="bans"
-              type="number"
-              min="0"
-              max="10"
-              value={formData.params.bans}
-              onChange={handleParamChange}
+              label={t('password')}
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder={t('enterPassword')}
+              required
             />
-          </Form.Group>
+            <Form.Field>
+              <label>{t('game')}</label>
+              <Dropdown
+                fluid
+                selection
+                options={gameOptions}
+                value={formData.game_id}
+                onChange={handleGameChange}
+              />
+            </Form.Field>
 
-          <Form.Group widths="equal">
-            <Form.Input
-              label={t('loserBans')}
-              name="loose_bans"
-              type="number"
-              min="0"
-              max="10"
-              value={formData.params.loose_bans}
-              onChange={handleParamChange}
-            />
-            <Form.Input
-              label={t('repick')}
-              name="repick"
-              type="number"
-              min="0"
-              max="10"
-              value={formData.params.repick}
-              onChange={handleParamChange}
-            />
-          </Form.Group>
+            <Form.Group widths="equal">
+              <Form.Input
+                label={t('random')}
+                name="random"
+                type="number"
+                min="0"
+                max="10"
+                value={formData.params.random}
+                onChange={handleParamChange}
+              />
+              <Form.Input
+                label={t('bans')}
+                name="bans"
+                type="number"
+                min="0"
+                max="10"
+                value={formData.params.bans}
+                onChange={handleParamChange}
+              />
+            </Form.Group>
 
-          {formError && (
-            <Message error>
-              <Message.Header>{t('error')}</Message.Header>
-              <p>{formError}</p>
-            </Message>
-          )}
+            <Form.Group widths="equal">
+              <Form.Input
+                label={t('loserBans')}
+                name="loser_bans"
+                type="number"
+                min="0"
+                max="10"
+                value={formData.params.loser_bans}
+                onChange={handleParamChange}
+              />
+              <Form.Input
+                label={t('repick')}
+                name="repick"
+                type="number"
+                min="0"
+                max="10"
+                value={formData.params.repick}
+                onChange={handleParamChange}
+              />
+            </Form.Group>
 
-          {formSuccess && (
-            <Message success>
-              <Message.Header>{t('success')}</Message.Header>
-              <p>{formSuccess}</p>
-            </Message>
-          )}
-        </Form>
+            {formError && (
+              <Message error>
+                <Message.Header>{t('error')}</Message.Header>
+                <p>{formError}</p>
+              </Message>
+            )}
+
+            {formSuccess && (
+              <Message success>
+                <Message.Header>{t('success')}</Message.Header>
+                <p>{formSuccess}</p>
+              </Message>
+            )}
+          </Form>
+        </Segment>
       </Modal.Content>
       <Modal.Actions>
         <Button onClick={onClose} disabled={isSubmitting}>

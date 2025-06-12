@@ -8,6 +8,7 @@ interface CardGroupProps {
   itemsPerRow?: SemanticWIDTHS;
   doubling?: boolean;
   stackable?: boolean;
+  style?: React.CSSProperties;
 }
 
 export default function CardGroup({
@@ -15,6 +16,7 @@ export default function CardGroup({
   itemsPerRow = 4,
   doubling = false,
   stackable = false,
+  style,
 }: CardGroupProps) {
   return (
     <Grid
@@ -22,6 +24,7 @@ export default function CardGroup({
       doubling={doubling}
       stackable={stackable}
       container
+      style={style}
     >
       {Array.isArray(children)
         ? children.map((child, index) => (

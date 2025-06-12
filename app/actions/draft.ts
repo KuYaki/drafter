@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { v4 as uuidv4 } from 'uuid';
 import type { Draft, DraftParams, GameId } from '@/types/draft';
 import {
   saveDraftToBlob,
@@ -10,13 +11,13 @@ import {
 } from '@/lib/storage/blob-storage';
 
 /**
- * Get a draft by name
+ * Get a draft by ID
  */
-async function getDraftByName(name: string): Promise<Draft | null> {
+export async function getDraftById(id: string): Promise<Draft | null> {
   try {
-    return await getDraftFromBlob(name);
+    return await getDraftFromBlob(id);
   } catch (error) {
-    console.error('Error getting draft by name:', error);
+    console.error('Error getting draft by ID:', error);
     return null;
   }
 }
@@ -35,9 +36,11 @@ interface createDraftProps {
 export async function createDraft(props: createDraftProps) {
   try {
     const timestamp = Date.now();
+    const id = uuidv4();
 
     // Create draft object with user-provided ID
     const draft: Draft = {
+      id,
       name: props.name,
       password: props.password, // In a real app, password should be hashed
       game_id: props.game_id,
@@ -46,10 +49,10 @@ export async function createDraft(props: createDraftProps) {
       updated_at: timestamp,
     };
 
-    // Check if draft with this name already exists
-    const existingDraft = await getDraftByName(props.name);
+    // Check if draft with this ID already exists
+    const existingDraft = await getDraftById(id);
     if (existingDraft) {
-      return { success: false, error: 'Draft with this name already exists' };
+      return { success: false, error: 'Draft with this ID already exists' };
     }
 
     // Save draft to Blob Storage
@@ -73,17 +76,17 @@ export async function createDraft(props: createDraftProps) {
 }
 
 interface deleteDraftProps {
-  name: string;
+  id: string;
   password: string;
 }
 
 /**
- * Deletes a draft by name and password
+ * Deletes a draft by ID and password
  */
 export async function deleteDraft(props: deleteDraftProps) {
   try {
-    // Get draft by name
-    const draft = await getDraftByName(props.name);
+    // Get draft by ID
+    const draft = await getDraftById(props.id);
 
     if (!draft) {
       return { success: false, error: 'Draft not found' };
@@ -95,7 +98,7 @@ export async function deleteDraft(props: deleteDraftProps) {
     }
 
     // Delete draft from Blob Storage
-    const deleted = await deleteDraftFromBlob(draft.name);
+    const deleted = await deleteDraftFromBlob(draft.id);
     if (!deleted) {
       return { success: false, error: 'Failed to delete draft' };
     }

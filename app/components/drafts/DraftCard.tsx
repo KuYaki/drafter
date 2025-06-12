@@ -9,17 +9,19 @@ import {
   Message,
   Label,
   LabelDetail,
-  Icon,
+  Segment,
 } from 'semantic-ui-react';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Draft } from '@/types/draft';
 import { useTheme } from '@/lib/theme/ThemeContext';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 interface DraftCardProps {
   draft: Draft;
   onDelete: (data: {
-    name: string;
+    id: string;
     password: string;
   }) => Promise<{ success: boolean; error?: string }>;
 }
@@ -29,7 +31,9 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
   const tc = useTranslations('common');
   const tg = useTranslations('games');
   const { isDark } = useTheme();
+  const router = useRouter();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -40,7 +44,7 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
 
     try {
       const result = await onDelete({
-        name: draft.name,
+        id: draft.id,
         password,
       });
 
@@ -57,10 +61,53 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
     }
   };
 
+  const handleOpen = () => {
+    // If no password is required, navigate directly
+    if (!draft.password) {
+      router.push(`/draft/${draft.id}`);
+      return;
+    }
+
+    // Check if we already have the password in cookies
+    const savedPassword = Cookies.get(`draft_password`);
+    if (savedPassword === draft.password) {
+      router.push(`/draft/${draft.id}`);
+      return;
+    }
+
+    // Otherwise show the password modal
+    setIsOpenModalOpen(true);
+  };
+
+  const handleOpenWithPassword = () => {
+    setError(null);
+
+    try {
+      // In a real app, you might want to verify the password on the server
+      // For now, we'll just check if it matches the draft password
+      if (password === draft.password) {
+        // Save the password in cookies
+        Cookies.set(`draft_password`, password, { expires: 30 }); // Expires in 7 days
+
+        // Close modal and navigate to draft page
+        setIsOpenModalOpen(false);
+        setPassword('');
+        router.push(`/draft/${draft.id}`);
+      } else {
+        setError(t('invalidPassword'));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
   return (
     <>
-      <Card style={{ overflow: 'hidden' }} as="a" fluid>
-        <Image src={`/images/games/${draft.game_id}/header.jpg`} />
+      <Card style={{ overflow: 'hidden' }} as="a" fluid onClick={handleOpen}>
+        <Image
+          src={`/images/games/${draft.game_id}/header.jpg`}
+          alt={tg(draft.game_id)}
+        />
         <Card.Content>
           <Card.Header>{draft.name}</Card.Header>
           <Card.Meta>{tg(draft.game_id)}</Card.Meta>
@@ -81,11 +128,11 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
                 </LabelDetail>
               </Label>
             ) : null}
-            {draft.params.loose_bans ? (
+            {draft.params.loser_bans ? (
               <Label color="blue" style={{ margin: '0.2rem' }}>
                 {t('loserBans')}
                 <LabelDetail style={{ whiteSpace: 'nowrap' }}>
-                  {'✯ ' + draft.params.loose_bans}
+                  {'✯ ' + draft.params.loser_bans}
                 </LabelDetail>
               </Label>
             ) : null}
@@ -99,8 +146,8 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
             ) : null}
           </Card.Description>
         </Card.Content>
-        <Card.Content extra>
-          <div className="flex items-center gap-[1rem]">
+        <Card.Content style={{ padding: '0.2rem' }}>
+          <div className="flex justify-between">
             <Button
               basic
               compact
@@ -112,17 +159,21 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
               basic
               compact
               color="red"
-              onClick={() => setIsDeleteModalOpen(true)}
-            >
-              {tc('delete')}
-            </Button>
+              icon="trash"
+              content={tc('delete')}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDeleteModalOpen(true);
+              }}
+            />
           </div>
         </Card.Content>
       </Card>
 
+      {/* Delete Modal */}
       <Modal
         size="tiny"
-        className={isDark ? 'dark' : ''}
+        basic
         closeIcon
         open={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -130,34 +181,71 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
       >
         <Modal.Header>{t('confirmDelete')}</Modal.Header>
         <Modal.Content>
-          <p style={{ color: 'black', marginBottom: '0.5rem' }}>
-            {t('deleteWarning', { name: draft.name })}
-          </p>
-          <Form>
-            <Form.Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('enterPassword')}
-              error={!!error}
-            />
-            {error && <Message negative content={error} />}
-          </Form>
+          <Segment inverted={isDark} style={{ overflow: 'hidden' }}>
+            <p style={{ color: 'var(--foreground)', marginBottom: '0.5rem' }}>
+              {t('deleteWarning', { name: draft.name })}
+            </p>
+            <Form>
+              <Form.Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t('enterPassword')}
+                error={!!error}
+              />
+              {error && <Message negative content={error} />}
+            </Form>
+          </Segment>
         </Modal.Content>
         <Modal.Actions>
-          <div className="flex items-center gap-2">
-            <Button onClick={() => setIsDeleteModalOpen(false)}>
-              {tc('cancel')}
-            </Button>
-            <Button
-              negative
-              onClick={handleDelete}
-              loading={isDeleting}
-              disabled={isDeleting}
-            >
-              {tc('confirm')}
-            </Button>
-          </div>
+          <Button onClick={() => setIsDeleteModalOpen(false)}>
+            {tc('cancel')}
+          </Button>
+          <Button
+            negative
+            onClick={handleDelete}
+            loading={isDeleting}
+            disabled={isDeleting}
+          >
+            {tc('confirm')}
+          </Button>
+        </Modal.Actions>
+      </Modal>
+
+      {/* Open Draft Modal */}
+      <Modal
+        size="tiny"
+        basic
+        closeIcon
+        open={isOpenModalOpen}
+        onClose={() => setIsOpenModalOpen(false)}
+        dimmer="blurring"
+      >
+        <Modal.Header>{tc('open')}</Modal.Header>
+        <Modal.Content>
+          <Segment inverted={isDark}>
+            <p style={{ color: 'var(--foreground)', marginBottom: '0.5rem' }}>
+              {t('passwordRequired')}
+            </p>
+            <Form>
+              <Form.Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t('enterPassword')}
+                error={!!error}
+              />
+              {error && <Message negative content={error} />}
+            </Form>
+          </Segment>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button onClick={() => setIsOpenModalOpen(false)}>
+            {tc('cancel')}
+          </Button>
+          <Button positive onClick={handleOpenWithPassword}>
+            {tc('confirm')}
+          </Button>
         </Modal.Actions>
       </Modal>
     </>

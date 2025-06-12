@@ -6,14 +6,14 @@ describe('Logo', () => {
     render(<Logo />);
     const logo = screen.getByAltText('Drafter');
     expect(logo).toHaveAttribute('src', '/images/logo-full.svg');
-    expect(logo).toHaveStyle({ height: '2rem' });
+    expect(logo).toHaveStyle({ height: '3rem' });
   });
 
   it('renders small logo when isSmall prop is true', () => {
     render(<Logo isSmall />);
     const logo = screen.getByAltText('Drafter');
     expect(logo).toHaveAttribute('src', '/images/logo.svg');
-    expect(logo).toHaveStyle({ height: '2rem' });
+    expect(logo).toHaveStyle({ height: '3rem' });
   });
 
   it('renders full dark logo in dark mode', () => {
@@ -27,7 +27,7 @@ describe('Logo', () => {
     render(<Logo />);
     const logo = screen.getByAltText('Drafter');
     expect(logo).toHaveAttribute('src', '/images/logo-full-dark.svg');
-    expect(logo).toHaveStyle({ height: '2rem' });
+    expect(logo).toHaveStyle({ height: '3rem' });
   });
 
   it('calls navigateTo when clicked', () => {

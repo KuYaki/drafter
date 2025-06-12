@@ -23,7 +23,7 @@ export default function Logo({ isSmall = false, isLinked = false }: LogoProps) {
       }
       alt="Drafter"
       style={{
-        height: '2rem',
+        height: '3rem',
       }}
     />
   );

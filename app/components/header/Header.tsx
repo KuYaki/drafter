@@ -18,8 +18,8 @@ export default function Header() {
         style={{ borderRadius: 0 }}
       >
         <Container>
-          <Menu.Item>
-            <Logo />
+          <Menu.Item style={{ paddingTop: 0, paddingBottom: 0 }}>
+            <Logo isLinked />
           </Menu.Item>
           <Menu.Item>
             <LanguageSwitcher />

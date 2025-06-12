@@ -5,7 +5,7 @@ import { Container, Header, Button, Divider } from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
 import DraftsList from './DraftsList';
 import DraftCreateModal from './DraftCreateModal';
-import useDrafts from './hooks/useDrafts';
+import { useDrafts } from './hooks/useDrafts';
 import { useTheme } from '@/lib/theme/ThemeContext';
 
 export default function DraftsView() {

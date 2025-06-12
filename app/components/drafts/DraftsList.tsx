@@ -11,7 +11,7 @@ interface DraftsListProps {
   loading: boolean;
   error: string | null;
   onDeleteDraft: (params: {
-    name: string;
+    id: string;
     password: string;
   }) => Promise<{ success: boolean; error?: string }>;
 }
@@ -23,11 +23,12 @@ export default function DraftsList({
   onDeleteDraft,
 }: DraftsListProps) {
   const t = useTranslations('drafts');
+  const tc = useTranslations('common');
 
   if (loading) {
     return (
       <Loader active inline="centered">
-        {t('loading')}
+        {tc('loading')}
       </Loader>
     );
   }
@@ -43,7 +44,7 @@ export default function DraftsList({
   return (
     <CardGroup itemsPerRow={4 as const} doubling stackable>
       {drafts.map((draft) => (
-        <DraftCard key={draft.name} draft={draft} onDelete={onDeleteDraft} />
+        <DraftCard key={draft.id} draft={draft} onDelete={onDeleteDraft} />
       ))}
     </CardGroup>
   );

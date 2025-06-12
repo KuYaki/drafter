@@ -33,7 +33,7 @@ export function useDrafts({ sortBy }: useDraftsProps) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sortBy]);
 
   // Create a new draft
   const handleCreateDraft = useCallback(
@@ -65,7 +65,7 @@ export function useDrafts({ sortBy }: useDraftsProps) {
 
   // Delete a draft
   const handleDeleteDraft = useCallback(
-    async (data: { name: string; password: string }) => {
+    async (data: { id: string; password: string }) => {
       try {
         const result = await deleteDraft(data);
 
