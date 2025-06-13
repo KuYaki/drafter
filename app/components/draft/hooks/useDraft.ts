@@ -544,8 +544,11 @@ export function useDraft(draft: Draft) {
         : user.skipped;
       const newPlayer: Player = {
         ...user,
-        locked: { id: data.characterId, amount: 0 },
-        state: 'waiting',
+        locked: {
+          id: data.characterId,
+          amount: draft.params.repick > 0 ? 0 : 1,
+        },
+        state: draft.params.repick > 0 ? 'waiting' : 'locked',
         skipped,
       };
       const lockedPlayers: Player[] = unlockedPlayers.map((player) => {
