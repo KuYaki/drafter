@@ -52,7 +52,7 @@ export default async function RootLayout({
 
   const messages = (await import(`@/locales/${locale}.json`)).default;
   const cookieStore = cookies();
-  const theme = (cookieStore.get('drafter_theme')?.value || 'light') as
+  const theme = (cookieStore.get('drafter_theme')?.value || 'dark') as
     | 'light'
     | 'dark';
   return (

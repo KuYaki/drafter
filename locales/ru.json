@@ -64,7 +64,12 @@
       "bannedBy": "Забанил {player}",
       "loserBannedForYou": "Поражение ({count})",
       "loserBannedFor": "Поражение для",
-      "wasLockedBy": "Скипнули"
+      "wasLockedBy": "Скипнули",
+      "pick": "Выбрать",
+      "ban": "Забанить",
+      "cancel": "Отмена",
+      "banHint": "Вы уверены, что хотите забанить {character}?",
+      "pickHint": "Вы уверены, что хотите выбрать {character}?"
     },
     "coe5": {
       "bakemono": "Бакемоно",

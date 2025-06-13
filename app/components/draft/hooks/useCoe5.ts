@@ -71,9 +71,9 @@ export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
           was_locked_by.reduce((sum, item) => sum + (item.amount || 0), 0) >=
             draft.params.repick) ||
         (user.state !== 'banning' &&
-          draft.params.random > 0 &&
-          !available_for.some((player) => player.id === user.id)) ||
-        user_looser_banned !== undefined;
+          ((draft.params.random > 0 &&
+            !available_for.some((player) => player.id === user.id)) ||
+            user_looser_banned !== undefined));
       return {
         ...character,
         locked_by: locked_by

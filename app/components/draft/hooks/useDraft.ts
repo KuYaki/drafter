@@ -298,7 +298,7 @@ export function useDraft(draft: Draft) {
           skipped: [],
           available: [],
           state: players.length > 0 ? 'waiting' : 'hosting',
-          disabled: true,
+          disabled: players.length > 0 ? true : false,
         };
         await notifyPlayers([...players, newPlayer]);
       } catch (err) {
@@ -472,6 +472,7 @@ export function useDraft(draft: Draft) {
         setError('User not in banning state');
         return;
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       const newPlayer: Player = {
         ...user,
         banned: [...user.banned, data.characterId],
@@ -504,6 +505,7 @@ export function useDraft(draft: Draft) {
         setError('User not joined');
         return;
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       if (user.locked?.id === data.characterId) {
         handleSkip();
         return;
@@ -559,7 +561,7 @@ export function useDraft(draft: Draft) {
         setError(err instanceof Error ? err.message : 'Failed to set color');
       }
     },
-    [user, players, prepareNextPlayer, notifyPlayers]
+    [user, players, prepareNextPlayer, handleSkip, notifyPlayers]
   );
 
   return {

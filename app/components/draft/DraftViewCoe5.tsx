@@ -96,7 +96,7 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
       <CharactersList
         characters={characters}
         gameId={draft.game_id}
-        userId={user?.id}
+        user={user}
         error={characterError}
         onClick={handleCharacterClick}
       />

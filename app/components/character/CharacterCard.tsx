@@ -1,33 +1,54 @@
 'use client';
 
-import { Card, Image, Button, Label, LabelDetail } from 'semantic-ui-react';
+import {
+  Card,
+  Image,
+  Button,
+  Label,
+  LabelDetail,
+  Modal,
+  Header,
+  Segment,
+} from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
 import type { Character, CharacterId } from '@/types/character';
 import type { GameId } from '@/types/draft';
+import { useState } from 'react';
+import { useTheme } from '@/lib/theme/ThemeContext';
+import { Player } from '@/types/player';
 
 interface CharacterCardProps {
   character: Character;
   gameId: GameId;
-  userId?: string | null;
+  user: Player | null;
   onClick: (characterId: CharacterId) => void;
 }
 
 export default function CharacterCard({
   character,
   gameId,
-  userId,
+  user,
   onClick,
 }: CharacterCardProps) {
   const t = useTranslations('characters');
   const tc = useTranslations('characters.common');
+  const [openModal, setOpenModal] = useState(false);
+  const { isDark } = useTheme();
 
   const handleClick = async () => {
-    userId && onClick(character.id);
+    setOpenModal(true);
+  };
+
+  const handleModalConfirm = () => {
+    user?.id && !character.disabled && onClick(character.id);
+    setOpenModal(false);
   };
 
   const userLooserBanned = character.loser_banned_for.find(
-    (player) => player.id === userId
+    (player) => player.id === user?.id
   );
+
+  const isBanning = user?.state === 'banning';
 
   const meta = character.locked_by
     ? tc('lockedBy', { player: character.locked_by.name })
@@ -47,7 +68,7 @@ export default function CharacterCard({
     character.locked_by ||
     character.available_for.length > 0 ||
     character.banned_by ||
-    character.loser_banned_for.some((player) => player.id === userId);
+    character.loser_banned_for.some((player) => player.id === user?.id);
 
   const showDescription =
     character.was_locked_by || character.loser_banned_for.length > 0;
@@ -139,6 +160,54 @@ export default function CharacterCard({
           )}
         </Card.Content>
       </Card>
+      <Modal
+        basic
+        closeIcon
+        size="tiny"
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        dimmer="blurring"
+      >
+        <Modal.Header>{isBanning ? tc('ban') : tc('pick')}</Modal.Header>
+        <Modal.Content>
+          <Segment inverted={isDark}>
+            <Image
+              src={`/images/games/${gameId}/chars/${character.id}.webp`}
+              alt={t(`${gameId}.${character.id}`)}
+              style={{
+                objectFit: 'contain',
+                height: '7rem',
+                backgroundColor: 'var(--background)',
+                width: '100%',
+              }}
+            />
+            <Header as="h4">
+              {isBanning
+                ? tc('banHint', { character: t(`${gameId}.${character.id}`) })
+                : tc('pickHint', { character: t(`${gameId}.${character.id}`) })}
+            </Header>
+          </Segment>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button
+            onClick={() => {
+              setOpenModal(false);
+            }}
+            inverted={isDark}
+            content={tc('cancel')}
+          />
+          <Button
+            onClick={() => {
+              handleModalConfirm();
+            }}
+            inverted={isDark}
+            color={isBanning ? 'red' : 'blue'}
+            icon={isBanning ? 'ban' : 'unlock alternate'}
+            labelPosition="right"
+            content={isBanning ? tc('ban') : tc('pick')}
+          />
+        </Modal.Actions>
+      </Modal>
     </>
   );
 }

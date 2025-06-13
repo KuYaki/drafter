@@ -74,7 +74,9 @@ export default function PlayersList({
           content={joinable ? t('join') : t('leave')}
           disabled={
             updating ||
-            (joinable && !players.some((player) => player.state === 'hosting'))
+            (joinable &&
+              players.length > 0 &&
+              !players.some((player) => player.state === 'hosting'))
           }
           loading={updating}
           primary={joinable}

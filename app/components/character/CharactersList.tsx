@@ -5,11 +5,12 @@ import CharacterCard from './CharacterCard';
 import type { Character, CharacterId } from '@/types/character';
 import CardGroup from '@/app/components/shared/ui/CardGroup';
 import type { GameId } from '@/types/draft';
+import type { Player } from '@/types/player';
 
 interface CharactersListProps {
   characters: Character[];
   gameId: GameId;
-  userId?: string | null;
+  user: Player | null;
   error: string | null;
   onClick: (characterId: CharacterId) => void;
 }
@@ -17,7 +18,7 @@ interface CharactersListProps {
 export default function CharactersList({
   characters,
   gameId,
-  userId,
+  user,
   error,
   onClick,
 }: CharactersListProps) {
@@ -32,7 +33,7 @@ export default function CharactersList({
           key={character.id}
           character={character}
           gameId={gameId}
-          userId={userId}
+          user={user}
           onClick={onClick}
         />
       ))}
