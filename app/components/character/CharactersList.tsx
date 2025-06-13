@@ -2,7 +2,7 @@
 
 import { Message } from 'semantic-ui-react';
 import CharacterCard from './CharacterCard';
-import type { Character } from '@/types/character';
+import type { Character, CharacterId } from '@/types/character';
 import CardGroup from '@/app/components/shared/ui/CardGroup';
 import type { GameId } from '@/types/draft';
 
@@ -11,7 +11,7 @@ interface CharactersListProps {
   gameId: GameId;
   userId?: string | null;
   error: string | null;
-  onClick: (data: { userId: string; characterId: string }) => Promise<void>;
+  onClick: (characterId: CharacterId) => void;
 }
 
 export default function CharactersList({

@@ -171,6 +171,7 @@ export async function setPlayersToBlobByDraftId(
     await put(blobPath, JSON.stringify(players), {
       contentType: 'application/json',
       allowOverwrite: true,
+      cacheControlMaxAge: 0,
       access: 'public', // or 'private' depending on security requirements
     });
 

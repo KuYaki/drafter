@@ -8,6 +8,7 @@ import CharactersList from '@/app/components/character/CharactersList';
 import { useCoe5 } from '@/app/components/draft/hooks/useCoe5';
 import { useDraft } from '@/app/components/draft/hooks/useDraft';
 import PlayersList from '@/app/components/player/PlayersList';
+import { CharacterId } from '@/types/character';
 
 interface DraftViewCoe5Props {
   draft: Draft;
@@ -26,13 +27,27 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
     handleLeave,
     handleSetColor,
     handleStart,
-    handleCharacterClick,
+    handleBan,
+    handlePick,
+    handleSkip,
+    handleLose,
   } = useDraft({ draft });
   const { characters, error: characterError } = useCoe5({
     players,
     user,
     draft,
   });
+
+  const handleCharacterClick = (characterId: CharacterId) => {
+    if (user?.state === 'choosing') {
+      handlePick({ characterId });
+    } else if (user?.state === 'banning') {
+      handleBan({
+        characterId,
+        characterIds: characters.map((c) => c.id),
+      });
+    }
+  };
 
   return (
     <Container>
@@ -53,12 +68,33 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
         <Header inverted={isDark} style={{ margin: 0 }}>
           {tc('characters')}
         </Header>
-        <Button
-          onClick={() => user?.id && handleStart(user.id)}
-          disabled={!user}
-          content={tc('start')}
-          color="green"
-        />
+        {players?.some((player) => player.state === 'hosting') && (
+          <Button
+            onClick={() =>
+              user?.state === 'hosting' &&
+              handleStart(characters.map((c) => c.id))
+            }
+            disabled={user?.state !== 'hosting'}
+            content={tc('start')}
+            color="green"
+          />
+        )}
+        {players?.some((player) => player.state === 'choosing') && (
+          <Button
+            onClick={() => user?.state === 'choosing' && handleSkip()}
+            disabled={user?.state !== 'choosing'}
+            content={tc('skip')}
+            color="blue"
+          />
+        )}
+        {players?.some((player) => player.state === 'playing') && (
+          <Button
+            onClick={() => user?.state === 'playing' && handleLose()}
+            disabled={user?.state !== 'playing'}
+            content={tc('lose')}
+            color="red"
+          />
+        )}
       </div>
 
       <CharactersList

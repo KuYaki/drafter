@@ -11,7 +11,7 @@ const intlMiddleware = createMiddleware({
 });
 
 // Constants for caching
-const WEEK_IN_SECONDS = 60 * 60 * 24 * 7; // 7 days in seconds
+const WEEK_IN_SECONDS = 1; // 7 days in seconds
 const WEBP_CACHE_HEADERS = {
   'Cache-Control': `public, max-age=${WEEK_IN_SECONDS}, immutable, stale-while-revalidate=${WEEK_IN_SECONDS}`,
   'CDN-Cache-Control': `public, max-age=${WEEK_IN_SECONDS}`,

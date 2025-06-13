@@ -2,7 +2,7 @@
 
 import { Card, Image, Button, Label, LabelDetail } from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
-import type { Character } from '@/types/character';
+import type { Character, CharacterId } from '@/types/character';
 import type { GameId } from '@/types/draft';
 
 interface CharacterCardProps {
@@ -10,7 +10,7 @@ interface CharacterCardProps {
   gameId: GameId;
   userId?: string | null;
   disabled?: boolean;
-  onClick: (data: { userId: string; characterId: string }) => Promise<void>;
+  onClick: (characterId: CharacterId) => void;
 }
 
 export default function CharacterCard({
@@ -24,7 +24,7 @@ export default function CharacterCard({
   const tc = useTranslations('characters.common');
 
   const handleClick = async () => {
-    userId && onClick({ userId, characterId: character.id });
+    userId && onClick(character.id);
   };
 
   const userLooserBanned = character.loser_banned_for.find(

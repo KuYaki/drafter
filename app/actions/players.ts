@@ -5,6 +5,7 @@ import {
   setPlayersToBlobByDraftId,
 } from '@/lib/storage/blob-storage';
 import { Player } from '@/types/player';
+import { revalidatePath } from 'next/cache';
 
 /**
  * Get players for a draft
@@ -38,6 +39,8 @@ export async function setPlayersToBlob(
     if (!saved) {
       return { success: false, error: 'Failed to save players' };
     }
+
+    revalidatePath('/drafts/' + props.draftId);
 
     return { success: true };
   } catch (error) {

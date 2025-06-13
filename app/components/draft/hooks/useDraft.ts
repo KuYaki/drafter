@@ -7,6 +7,7 @@ import { colors, Player, PlayerColor } from '@/types/player';
 import Cookies from 'js-cookie';
 import Pusher from 'pusher-js';
 import { v4 as uuidv4 } from 'uuid';
+import { CharacterId } from '@/types/character';
 
 interface useDraftProps {
   draft: Draft;
@@ -54,6 +55,154 @@ export function useDraft({ draft }: useDraftProps) {
     Cookies.set('user_name', player.name, { expires: 30 }); // Expires in 7 days
     Cookies.set('user_password', player.password, { expires: 30 }); // Expires in 7 days
     setUser(player);
+  }, []);
+
+  const prepareDraft = useCallback((currentPlayers: Player[]) => {
+    const newPlayers = currentPlayers.map((player, id) => {
+      const newPlayer: Player = {
+        ...player,
+        banned: [],
+        skipped: [],
+        available: [],
+        state: id === 0 ? 'hosting' : 'waiting',
+        disabled: id === 0 ? false : true,
+      };
+      return newPlayer;
+    });
+    return newPlayers;
+  }, []);
+
+  const prepareRandomDraft = useCallback(
+    (currentPlayers: Player[], characterIds: CharacterId[]) => {
+      const filteredCharacterIds = characterIds.filter(
+        (id) =>
+          !currentPlayers.some((player) =>
+            player.banned.some((banned) => banned === id)
+          )
+      );
+      if (
+        filteredCharacterIds.length <
+        draft.params.random * currentPlayers.length
+      ) {
+        setError('Not enough not banned characters for random draft');
+        return currentPlayers;
+      }
+      const randomCharacterIds = filteredCharacterIds.sort(
+        () => 0.5 - Math.random()
+      );
+      var selectedCharacters: CharacterId[] = [];
+      const newPlayers = currentPlayers.map((player) => {
+        const draftAmount = Math.max(
+          1,
+          draft.params.random -
+            player.loser_banned.reduce((sum, item) => sum + item.amount, 0)
+        );
+        var available: CharacterId[] = [];
+        var notBannedCharacters = randomCharacterIds.filter(
+          (id) =>
+            !player.loser_banned.some(
+              (loser_banned) => loser_banned.id === id
+            ) && !selectedCharacters.includes(id)
+        );
+        if (notBannedCharacters.length < draftAmount) {
+          notBannedCharacters = randomCharacterIds.filter(
+            (id) => !selectedCharacters.includes(id)
+          );
+        }
+        available.push(...notBannedCharacters.slice(0, draftAmount));
+        selectedCharacters.push(...available);
+        const newPlayer: Player = {
+          ...player,
+          available,
+        };
+        return newPlayer;
+      });
+      return newPlayers;
+    },
+    [draft]
+  );
+
+  const prepareNextPlayer = useCallback(
+    (currentPlayers: Player[]): Player[] => {
+      if (!user) {
+        setError('User not joined');
+        return currentPlayers;
+      }
+      if (user.state !== 'choosing' && user.state !== 'banning') {
+        setError('User not in choosing or banning state');
+        return currentPlayers;
+      }
+      const currentPlayerIndex = currentPlayers.findIndex(
+        (player) => player.id === user.id
+      );
+      if (currentPlayerIndex === -1) {
+        setError('No current player found');
+        return currentPlayers;
+      }
+      const nextPlayerIndex =
+        currentPlayerIndex === currentPlayers.length - 1
+          ? 0
+          : currentPlayerIndex + 1;
+      const nextPlayer = currentPlayers[nextPlayerIndex];
+      const newNextPlayer: Player = {
+        ...nextPlayer,
+        state: user.state,
+      };
+      const newPlayers: Player[] = currentPlayers.map((player) => {
+        if (player.id === nextPlayer.id) {
+          return newNextPlayer;
+        }
+        return player;
+      });
+      return newPlayers;
+    },
+    [user]
+  );
+
+  const startBan = useCallback((currentPlayers: Player[]) => {
+    const newPlayers = currentPlayers.map((player, id) => {
+      const newPlayer: Player = {
+        ...player,
+        banned: [],
+        skipped: [],
+        available: [],
+        state: id === 0 ? 'banning' : 'waiting',
+        disabled: id === 0 ? false : true,
+      };
+      return newPlayer;
+    });
+    return newPlayers;
+  }, []);
+
+  const startDraft = useCallback(
+    (currentPlayers: Player[], characterIds: CharacterId[]) => {
+      const preparedPlayers =
+        draft.params.random > 0
+          ? prepareRandomDraft(currentPlayers, characterIds)
+          : currentPlayers;
+      const newPlayers = preparedPlayers.map((player, id) => {
+        const newPlayer: Player = {
+          ...player,
+          state: id === 0 ? 'choosing' : 'waiting',
+          disabled: id === 0 ? false : true,
+        };
+        return newPlayer;
+      });
+      return newPlayers;
+    },
+    [draft, prepareRandomDraft]
+  );
+
+  const startGame = useCallback((currentPlayers: Player[]) => {
+    const newPlayers = currentPlayers.map((player) => {
+      const newPlayer: Player = {
+        ...player,
+        state: 'playing',
+        disabled: true,
+      };
+      return newPlayer;
+    });
+    return newPlayers;
   }, []);
 
   useEffect(() => {
@@ -109,6 +258,13 @@ export function useDraft({ draft }: useDraftProps) {
 
   const handleJoin = useCallback(
     async (data: { name: string; password: string }) => {
+      if (
+        players.length > 0 &&
+        !players.some((player) => player.state === 'hosting')
+      ) {
+        setError('No possible to join during draft in progress');
+        return;
+      }
       Cookies.set('user_name', data.name, { expires: 30 }); // Expires in 7 days
       Cookies.set('user_password', data.password, { expires: 30 }); // Expires in 7 days
       const potentialUser = players?.find(
@@ -134,7 +290,7 @@ export function useDraft({ draft }: useDraftProps) {
           loser_banned: [],
           skipped: [],
           available: [],
-          state: 'waiting',
+          state: players.length > 0 ? 'waiting' : 'hosting',
           disabled: true,
         };
         await notifyPlayers([...players, newPlayer]);
@@ -151,14 +307,15 @@ export function useDraft({ draft }: useDraftProps) {
       return;
     }
     try {
-      const newPlayers = players.filter((player) => player.id !== user.id);
+      const filteredPlayers = players.filter((player) => player.id !== user.id);
+      const newPlayers = prepareDraft(filteredPlayers);
       await notifyPlayers(newPlayers);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to leave draft');
     } finally {
       setUser(null);
     }
-  }, [user, players, notifyPlayers]);
+  }, [user, players, prepareDraft, notifyPlayers]);
 
   const handleSetColor = useCallback(
     async (data: { color: PlayerColor }) => {
@@ -184,11 +341,206 @@ export function useDraft({ draft }: useDraftProps) {
     [user, players, notifyPlayers]
   );
 
-  const handleStart = useCallback(async (userId: string) => {}, []);
+  const handleStart = useCallback(
+    async (characterIds: CharacterId[]) => {
+      if (!user) {
+        setError('User not joined');
+        return;
+      }
+      if (user.state !== 'hosting') {
+        setError('User is not hosting');
+        return;
+      }
+      const newPlayers =
+        draft.params.bans > 0
+          ? startBan(players)
+          : startDraft(players, characterIds);
+      try {
+        await notifyPlayers(newPlayers);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to start draft');
+      }
+    },
+    [draft, user, players, startBan, startDraft, notifyPlayers]
+  );
 
-  const handleCharacterClick = useCallback(
-    async (data: { userId: string; characterId: string }) => {},
-    []
+  const handleSkip = useCallback(async () => {
+    if (!user) {
+      setError('User not joined');
+      return;
+    }
+    if (!user.locked) {
+      setError('Leader not chosen');
+      return;
+    }
+    if (user.state !== 'choosing') {
+      setError('User not in choosing state');
+      return;
+    }
+    const newPlayer: Player = {
+      ...user,
+      locked: {
+        ...user.locked,
+        amount: user.locked.amount + 1,
+      },
+      state: user.locked.amount === 0 ? 'locked' : 'ready',
+    };
+    const stateUpdatedPlayers: Player[] = players.map((player) => {
+      if (player.id === user.id) {
+        return newPlayer;
+      }
+      return player;
+    });
+    const shouldStartGame =
+      stateUpdatedPlayers.every(
+        (player) => player.state === 'locked' || player.state === 'ready'
+      ) ||
+      stateUpdatedPlayers.reduce(
+        (acc, player) => acc + (player.state === 'ready' ? 1 : 0),
+        0
+      ) >
+        players.length / 2;
+    const newPlayers: Player[] = shouldStartGame
+      ? startGame(stateUpdatedPlayers)
+      : prepareNextPlayer(stateUpdatedPlayers);
+    try {
+      await notifyPlayers(newPlayers);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start draft');
+    }
+  }, [user, players, startGame, prepareNextPlayer, notifyPlayers]);
+
+  const handleLose = useCallback(async () => {
+    if (!user) {
+      setError('User not joined');
+      return;
+    }
+    if (!user.locked) {
+      setError('Leader not chosen');
+      return;
+    }
+    const loseCountedPlayers: Player[] = players.map((player) => {
+      const loser_banned =
+        player.id === user.id
+          ? [
+              ...user.loser_banned,
+              { id: user.locked!.id, amount: draft.params.loser_bans },
+            ]
+          : player.loser_banned
+              .map((loser_banned) => {
+                return { id: loser_banned.id, amount: loser_banned.amount - 1 };
+              })
+              .filter((loser_banned) => {
+                return loser_banned.amount > 0;
+              });
+      const newPlayer: Player = {
+        ...player,
+        loser_banned,
+      };
+      return newPlayer;
+    });
+    const newPlayers = prepareDraft(loseCountedPlayers);
+    try {
+      await notifyPlayers(newPlayers);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start draft');
+    }
+  }, [draft, user, players, prepareDraft, notifyPlayers]);
+
+  const handleBan = useCallback(
+    async (data: { characterId: CharacterId; characterIds: CharacterId[] }) => {
+      if (!user) {
+        setError('User not joined');
+        return;
+      }
+      if (user.state !== 'banning') {
+        setError('User not in banning state');
+        return;
+      }
+      const newPlayer: Player = {
+        ...user,
+        banned: [...user.banned, data.characterId],
+        state: 'waiting',
+      };
+      const banCountedPlayers: Player[] = players.map((player) => {
+        if (player.id === user.id) {
+          return newPlayer;
+        }
+        return player;
+      });
+      const shouldStartDraft = banCountedPlayers.every(
+        (player) => player.banned.length >= draft.params.bans
+      );
+      const newPlayers = shouldStartDraft
+        ? startDraft(banCountedPlayers, data.characterIds)
+        : prepareNextPlayer(banCountedPlayers);
+      try {
+        await notifyPlayers(newPlayers);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to start draft');
+      }
+    },
+    [draft, user, players, startDraft, prepareNextPlayer, notifyPlayers]
+  );
+
+  const handlePick = useCallback(
+    async (data: { characterId: CharacterId }) => {
+      if (!user) {
+        setError('User not joined');
+        return;
+      }
+      const unlockedPlayers: Player[] =
+        user.locked?.amount || 0 > 0
+          ? players.map((player) => {
+              if (player.locked) {
+                return {
+                  ...player,
+                  locked: {
+                    ...player.locked,
+                    amount: player.locked.amount > 0 ? 1 : 0,
+                  },
+                  state: player.locked.amount === 0 ? 'locked' : 'ready',
+                };
+              }
+              return player;
+            })
+          : players;
+      const possibleSkipped = user.skipped.find(
+        (skipped) => skipped.id === user.locked?.id
+      );
+      const skipped = possibleSkipped
+        ? user.skipped.map((skipped) => {
+            if (skipped.id === user.locked?.id) {
+              return {
+                ...skipped,
+                amount: skipped.amount + 1,
+              };
+            }
+            return skipped;
+          })
+        : user.locked
+        ? [...user.skipped, { id: user.locked!.id, amount: 1 }]
+        : user.skipped;
+      const newPlayer: Player = {
+        ...user,
+        locked: { id: data.characterId, amount: 0 },
+        state: 'waiting',
+        skipped,
+      };
+      const lockedPlayers: Player[] = unlockedPlayers.map((player) => {
+        if (player.id === user.id) {
+          return newPlayer;
+        }
+        return player;
+      });
+      const newPlayers = prepareNextPlayer(lockedPlayers);
+      try {
+        await notifyPlayers(newPlayers);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to set color');
+      }
+    },
+    [user, players, prepareNextPlayer, notifyPlayers]
   );
 
   return {
@@ -201,7 +553,10 @@ export function useDraft({ draft }: useDraftProps) {
     handleLeave,
     handleSetColor,
     handleStart,
-    handleCharacterClick,
+    handleBan,
+    handlePick,
+    handleSkip,
+    handleLose,
   };
 }
 

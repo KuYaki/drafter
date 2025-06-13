@@ -26,7 +26,7 @@ export function useCoe5({ players, user, draft }: useDraftProps) {
   useEffect(() => {
     const updatedCharacters = characters.map((character) => {
       const locked_by = players.find(
-        (player) => player.locked === character.id
+        (player) => player.locked?.id === character.id
       );
       const banned_by = players.find((player) =>
         player.banned.some((banned) => banned === character.id)
