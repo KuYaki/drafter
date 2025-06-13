@@ -9,7 +9,6 @@ interface CharacterCardProps {
   character: Character;
   gameId: GameId;
   userId?: string | null;
-  disabled?: boolean;
   onClick: (characterId: CharacterId) => void;
 }
 
@@ -17,7 +16,6 @@ export default function CharacterCard({
   character,
   gameId,
   userId,
-  disabled,
   onClick,
 }: CharacterCardProps) {
   const t = useTranslations('characters');
@@ -34,7 +32,11 @@ export default function CharacterCard({
   const meta = character.locked_by
     ? tc('lockedBy', { player: character.locked_by.name })
     : character.available_for.length > 0
-    ? tc('availableFor', { players: character.available_for.join(', ') })
+    ? tc('availableFor', {
+        players: character.available_for
+          .map((player) => player.name)
+          .join(', '),
+      })
     : character.banned_by
     ? tc('bannedBy', { player: character.banned_by.name })
     : userLooserBanned
@@ -53,11 +55,11 @@ export default function CharacterCard({
   return (
     <>
       <Card
-        disabled={disabled}
-        style={{ overflow: 'hidden', opacity: disabled ? 0.8 : 1 }}
-        as={disabled ? undefined : 'a'}
+        disabled={character.disabled}
+        style={{ overflow: 'hidden', opacity: character.disabled ? 0.6 : 1 }}
+        link={character.disabled ? false : true}
         fluid
-        onClick={handleClick}
+        onClick={character.disabled ? undefined : handleClick}
       >
         <Image
           src={`/images/games/${gameId}/chars/${character.id}.webp`}
@@ -91,8 +93,8 @@ export default function CharacterCard({
           )}
           {showDescription && (
             <Card.Description>
-              {character.loser_banned_for ? (
-                <>
+              {character.loser_banned_for.length > 0 ? (
+                <div>
                   {tc('loserBannedFor')}:
                   {character.loser_banned_for.map((player) => {
                     return (
@@ -101,7 +103,7 @@ export default function CharacterCard({
                         color="red"
                         style={{ margin: '0.2rem' }}
                       >
-                        {t(player.name)}
+                        {player.name}
                         {player.amount && (
                           <LabelDetail style={{ whiteSpace: 'nowrap' }}>
                             {'✯ ' + player.amount}
@@ -110,10 +112,10 @@ export default function CharacterCard({
                       </Label>
                     );
                   })}
-                </>
+                </div>
               ) : null}
-              {character.was_locked_by ? (
-                <>
+              {character.was_locked_by.length > 0 ? (
+                <div>
                   {tc('wasLockedBy')}:
                   {character.was_locked_by.map((player) => {
                     return (
@@ -122,7 +124,7 @@ export default function CharacterCard({
                         color="red"
                         style={{ margin: '0.2rem' }}
                       >
-                        {t(player.name)}
+                        {player.name}
                         {player.amount && (
                           <LabelDetail style={{ whiteSpace: 'nowrap' }}>
                             {'✯ ' + player.amount}
@@ -131,7 +133,7 @@ export default function CharacterCard({
                       </Label>
                     );
                   })}
-                </>
+                </div>
               ) : null}
             </Card.Description>
           )}

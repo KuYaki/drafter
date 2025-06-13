@@ -9,11 +9,7 @@ import Pusher from 'pusher-js';
 import { v4 as uuidv4 } from 'uuid';
 import { CharacterId } from '@/types/character';
 
-interface useDraftProps {
-  draft: Draft;
-}
-
-export function useDraft({ draft }: useDraftProps) {
+export function useDraft(draft: Draft) {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -147,12 +143,13 @@ export function useDraft({ draft }: useDraftProps) {
       const newNextPlayer: Player = {
         ...nextPlayer,
         state: user.state,
+        disabled: false,
       };
       const newPlayers: Player[] = currentPlayers.map((player) => {
         if (player.id === nextPlayer.id) {
           return newNextPlayer;
         }
-        return player;
+        return { ...player, disabled: true };
       });
       return newPlayers;
     },
@@ -197,6 +194,16 @@ export function useDraft({ draft }: useDraftProps) {
     const newPlayers = currentPlayers.map((player) => {
       const newPlayer: Player = {
         ...player,
+        locked: player.locked
+          ? player.locked
+          : player.available.length > 0
+          ? {
+              id: player.available[
+                Math.floor(Math.random() * player.available.length) * 0.999
+              ],
+              amount: 0,
+            }
+          : undefined,
         state: 'playing',
         disabled: true,
       };
@@ -351,10 +358,18 @@ export function useDraft({ draft }: useDraftProps) {
         setError('User is not hosting');
         return;
       }
+      const shuffledPlayers = [...players].sort(() => 0.5 - Math.random());
+      const clearedPlayers = shuffledPlayers.map((player) => ({
+        ...player,
+        locked: undefined,
+        banned: [],
+        skipped: [],
+        available: [],
+      }));
       const newPlayers =
         draft.params.bans > 0
-          ? startBan(players)
-          : startDraft(players, characterIds);
+          ? startBan(clearedPlayers)
+          : startDraft(clearedPlayers, characterIds);
       try {
         await notifyPlayers(newPlayers);
       } catch (err) {
@@ -489,8 +504,12 @@ export function useDraft({ draft }: useDraftProps) {
         setError('User not joined');
         return;
       }
+      if (user.locked?.id === data.characterId) {
+        handleSkip();
+        return;
+      }
       const unlockedPlayers: Player[] =
-        user.locked?.amount || 0 > 0
+        (user.locked?.amount || 0) > 0
           ? players.map((player) => {
               if (player.locked) {
                 return {
@@ -499,7 +518,7 @@ export function useDraft({ draft }: useDraftProps) {
                     ...player.locked,
                     amount: player.locked.amount > 0 ? 1 : 0,
                   },
-                  state: player.locked.amount === 0 ? 'locked' : 'ready',
+                  state: player.locked.amount > 0 ? 'locked' : 'waiting',
                 };
               }
               return player;
@@ -519,7 +538,7 @@ export function useDraft({ draft }: useDraftProps) {
             return skipped;
           })
         : user.locked
-        ? [...user.skipped, { id: user.locked!.id, amount: 1 }]
+        ? [...user.skipped, { id: user.locked.id, amount: 1 }]
         : user.skipped;
       const newPlayer: Player = {
         ...user,

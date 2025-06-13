@@ -28,7 +28,7 @@ export default function PlayerCard({
   gameId,
   onColorChange,
 }: PlayerCardProps) {
-  const t = useTranslations('characters.common');
+  const t = useTranslations('characters');
   const tc = useTranslations('common.color');
   const tp = useTranslations('players');
 
@@ -48,8 +48,11 @@ export default function PlayerCard({
     <>
       <Card
         disabled={player.disabled}
-        style={{ overflow: 'hidden' }}
-        as="a"
+        style={{
+          overflow: 'hidden',
+          opacity: player.disabled ? 0.6 : 1,
+        }}
+        link={editable}
         fluid
       >
         {editable ? (
@@ -111,21 +114,27 @@ export default function PlayerCard({
         <Image
           src={
             player.locked
-              ? `/images/games/${gameId}/chars/${player.locked}.webp`
+              ? `/images/games/${gameId}/chars/${player.locked.id}.webp`
               : `/images/games/${gameId}/chars/default.webp`
           }
-          alt={player.locked ? t(`${gameId}.${player.locked}`) : t('random')}
+          alt={
+            player.locked
+              ? t(`${gameId}.${player.locked.id}`)
+              : t('common.random')
+          }
           style={{
             objectFit: 'contain',
             height: '10rem',
             backgroundColor: 'var(--background)',
           }}
         />
-        <Card.Content>
+        <Card.Content style={{ paddingTop: '0.3rem', paddingBottom: '0.3rem' }}>
           <Card.Header>
-            {player.locked ? t(`${gameId}.${player.locked}`) : t('random')}
+            {player.locked
+              ? t(`${gameId}.${player.locked.id}`)
+              : t('common.random')}
           </Card.Header>
-          <Card.Meta>
+          <Card.Meta style={{ paddingTop: '0.3rem' }}>
             <Button
               disabled
               compact
@@ -146,8 +155,8 @@ export default function PlayerCard({
           </Card.Meta>
           {showDescription && (
             <Card.Description>
-              {player.banned ? (
-                <>
+              {player.banned.length > 0 ? (
+                <div>
                   {tp('banned')}:
                   {player.banned.map((character) => {
                     return (
@@ -160,10 +169,10 @@ export default function PlayerCard({
                       </Label>
                     );
                   })}
-                </>
+                </div>
               ) : null}
-              {player.available ? (
-                <>
+              {player.available.length > 0 ? (
+                <div>
                   {tp('available')}:
                   {player.available.map((character) => {
                     return (
@@ -176,10 +185,10 @@ export default function PlayerCard({
                       </Label>
                     );
                   })}
-                </>
+                </div>
               ) : null}
-              {player.skipped ? (
-                <>
+              {player.skipped.length > 0 ? (
+                <div>
                   {tp('skipped')}:
                   {player.skipped.map((character) => {
                     return (
@@ -197,10 +206,10 @@ export default function PlayerCard({
                       </Label>
                     );
                   })}
-                </>
+                </div>
               ) : null}
-              {player.loser_banned ? (
-                <>
+              {player.loser_banned.length > 0 ? (
+                <div>
                   {tp('loserBanned')}:
                   {player.loser_banned.map((character) => {
                     return (
@@ -218,7 +227,7 @@ export default function PlayerCard({
                       </Label>
                     );
                   })}
-                </>
+                </div>
               ) : null}
             </Card.Description>
           )}

@@ -118,7 +118,7 @@
     "ready": "Listo",
     "playing": "Jugando",
     "skipped": "Saltado",
-    "loser_banned": "Derrotado",
+    "loserBanned": "Derrotado",
     "available": "Disponible",
     "banned": "Baneado"
   }

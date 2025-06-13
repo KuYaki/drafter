@@ -118,7 +118,7 @@
     "ready": "Готов",
     "playing": "Играет",
     "skipped": "Скипнул",
-    "loser_banned": "Поражение",
+    "loserBanned": "Поражение",
     "available": "Доступно",
     "banned": "Забанил"
   }

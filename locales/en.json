@@ -118,7 +118,7 @@
     "ready": "Ready",
     "playing": "Playing",
     "skipped": "Skipped",
-    "loser_banned": "Losed",
+    "loserBanned": "Losed",
     "available": "Available",
     "banned": "Banned"
   }

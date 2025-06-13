@@ -5,13 +5,7 @@ import { Player } from '@/types/player';
 import { Character, characterIdsCoe5 } from '@/types/character';
 import { Draft } from '@/types/draft';
 
-interface useDraftProps {
-  players: Player[];
-  user: Player | null;
-  draft: Draft;
-}
-
-export function useCoe5({ players, user, draft }: useDraftProps) {
+export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
   const [error] = useState<string | null>(null);
   const [characters, setCharacters] = useState<Character[]>(
     characterIdsCoe5.map((id) => ({
@@ -39,9 +33,8 @@ export function useCoe5({ players, user, draft }: useDraftProps) {
           id: player.id,
           name: player.name,
           color: player.color,
-          amount: player.loser_banned.find(
-            (loser_banned) => loser_banned.id === character.id
-          )?.amount,
+          amount: player.skipped.find((skipped) => skipped.id === character.id)
+            ?.amount,
         }));
       const loser_banned_for = players
         .filter((player) =>
@@ -71,14 +64,16 @@ export function useCoe5({ players, user, draft }: useDraftProps) {
       );
       const disabled =
         user?.id === undefined ||
-        user_looser_banned !== undefined ||
+        (user.state !== 'choosing' && user.state !== 'banning') ||
         banned_by !== undefined ||
         (locked_by !== undefined && locked_by.id !== user.id) ||
         (draft.params.repick > 0 &&
-          was_locked_by.reduce((sum, item) => sum + (item.amount || 0), 0) >
+          was_locked_by.reduce((sum, item) => sum + (item.amount || 0), 0) >=
             draft.params.repick) ||
-        (draft.params.random > 0 &&
-          !available_for.some((player) => player.id === user.id));
+        (user.state !== 'banning' &&
+          draft.params.random > 0 &&
+          !available_for.some((player) => player.id === user.id)) ||
+        user_looser_banned !== undefined;
       return {
         ...character,
         locked_by: locked_by
@@ -104,7 +99,7 @@ export function useCoe5({ players, user, draft }: useDraftProps) {
     });
     setCharacters(updatedCharacters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players]);
+  }, [draft, user, players]);
 
   return {
     characters,

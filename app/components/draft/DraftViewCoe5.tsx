@@ -31,12 +31,8 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
     handlePick,
     handleSkip,
     handleLose,
-  } = useDraft({ draft });
-  const { characters, error: characterError } = useCoe5({
-    players,
-    user,
-    draft,
-  });
+  } = useDraft(draft);
+  const { characters, error: characterError } = useCoe5(players, user, draft);
 
   const handleCharacterClick = (characterId: CharacterId) => {
     if (user?.state === 'choosing') {
@@ -82,7 +78,7 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
         {players?.some((player) => player.state === 'choosing') && (
           <Button
             onClick={() => user?.state === 'choosing' && handleSkip()}
-            disabled={user?.state !== 'choosing'}
+            disabled={user?.state !== 'choosing' || user.locked === undefined}
             content={tc('skip')}
             color="blue"
           />
