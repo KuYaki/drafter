@@ -7,9 +7,12 @@ import Cookies from 'js-cookie';
 import { syncCookies } from '@/lib/cookies/actions';
 
 const languageOptions = [
-  { key: 'es', text: 'ES', value: 'es', flag: 'ar' },
   { key: 'en', text: 'EN', value: 'en', flag: 'gb' },
+  { key: 'es', text: 'ES', value: 'es', flag: 'ar' },
   { key: 'ru', text: 'RU', value: 'ru', flag: 'ru' },
+  { key: 'km', text: 'KM', value: 'km', flag: 'kh' },
+  { key: 'nl', text: 'NL', value: 'nl', flag: 'nl' },
+  { key: 'uk', text: 'UK', value: 'uk', flag: 'ua' },
 ];
 
 export default function LanguageSwitcher() {
