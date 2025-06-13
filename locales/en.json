@@ -64,7 +64,12 @@
       "bannedBy": "Banned by {player}",
       "loserBannedForYou": "Defeat ({count})",
       "loserBannedFor": "Defeat for",
-      "wasLockedBy": "Skipped by"
+      "wasLockedBy": "Skipped by",
+      "pick": "Pick",
+      "ban": "Ban",
+      "cancel": "Cancel",
+      "banHint": "Are you sure you want to ban {character}?",
+      "pickHint": "Are you sure you want to pick {character}?"
     },
     "coe5": {
       "bakemono": "Bakemono",
