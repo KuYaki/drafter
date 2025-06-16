@@ -25,7 +25,10 @@ export function useDraft(draft: Draft) {
         body: JSON.stringify({
           channel: draft.id,
           event: 'set-players',
-          message: newPlayers,
+          message: {
+            old: players,
+            new: newPlayers,
+          },
         }),
       });
       setUpdating(false);
@@ -34,7 +37,98 @@ export function useDraft(draft: Draft) {
         players: newPlayers,
       });
     },
-    [draft.id]
+    [draft.id, players]
+  );
+
+  const mergePlayers = useCallback(
+    (oldPlayers: Player[], currentPlayers: Player[], newPlayers: Player[]) => {
+      // Create maps for faster lookups
+      const oldPlayersMap = new Map(oldPlayers.map((p) => [p.id, p]));
+      const newPlayersMap = new Map(newPlayers.map((p) => [p.id, p]));
+      const oldPlayersPositions = new Map(
+        oldPlayers.map((p, index) => [p.id, index])
+      );
+      const shiftIndex = new Map(
+        newPlayers.map((p, index) => [
+          p.id,
+          (oldPlayersPositions.get(p.id) ?? index) - index,
+        ])
+      );
+
+      // Find added, modified, and deleted players
+      const addedPlayers: [string, string[]][] = newPlayers
+        .map((p, index): [string, string[]] => [
+          p.id,
+          newPlayers.slice(index, newPlayers.length).map((p) => p.id),
+        ])
+        .filter(([id]) => !oldPlayersMap.has(id));
+      const modifiedPlayerIds = new Set(
+        newPlayers
+          .filter(
+            (player) =>
+              oldPlayersMap.has(player.id) &&
+              JSON.stringify(oldPlayersMap.get(player.id)) !==
+                JSON.stringify(player)
+          )
+          .map((p) => p.id)
+      );
+      const deletedPlayerIds = new Set(
+        oldPlayers
+          .filter((player) => !newPlayersMap.has(player.id))
+          .map((p) => p.id)
+      );
+
+      // Start with current players that haven't been deleted
+      let result = currentPlayers.filter((p) => !deletedPlayerIds.has(p.id));
+
+      // Update modified players
+      result = result.map((player) => {
+        if (modifiedPlayerIds.has(player.id)) {
+          const oldPlayer = oldPlayersMap.get(player.id);
+          const newPlayer = newPlayersMap.get(player.id)!;
+
+          // Create a new player object with only the modified fields
+          const updatedPlayer = { ...player };
+
+          // Compare each field and update only those that changed
+          Object.keys(newPlayer).forEach((key) => {
+            const typedKey = key as keyof Player;
+            if (
+              JSON.stringify(oldPlayer?.[typedKey]) !==
+              JSON.stringify(newPlayer[typedKey])
+            ) {
+              (updatedPlayer as any)[typedKey] = newPlayer[typedKey];
+            }
+          });
+
+          return updatedPlayer;
+        }
+        return player;
+      });
+
+      // Add new players in the correct position
+      for (const [id, postIds] of addedPlayers) {
+        const playerIndex = result.findIndex((p) => postIds.includes(p.id));
+        const player = newPlayersMap.get(id);
+        if (!player) continue; // Skip if player not found (shouldn't happen)
+
+        if (playerIndex === -1) {
+          result.push(player);
+        } else if (id === result[playerIndex].id) {
+          result[playerIndex] = player;
+        } else {
+          result.splice(playerIndex, 0, player);
+        }
+      }
+
+      const weights = new Map(
+        result.map((p, index) => [p.id, index - (shiftIndex.get(p.id) ?? 0)])
+      );
+      return result.sort(
+        (a, b) => (weights.get(a.id) ?? 0) - (weights.get(b.id) ?? 0)
+      );
+    },
+    []
   );
 
   const getCurrentUser = useCallback(() => {
@@ -239,9 +333,14 @@ export function useDraft(draft: Draft) {
     });
 
     const channel = pusher.subscribe(draft.id);
-    channel.bind('set-players', function (data: { message: Player[] }) {
-      setPlayers(data.message);
-    });
+    channel.bind(
+      'set-players',
+      function (data: { message: { old: Player[]; new: Player[] } }) {
+        setPlayers((prev) =>
+          mergePlayers(data.message.old, prev, data.message.new)
+        );
+      }
+    );
 
     async function fetchPlayers() {
       try {
@@ -261,7 +360,7 @@ export function useDraft(draft: Draft) {
       channel.unbind_all();
       channel.unsubscribe();
     };
-  }, [draft.id]);
+  }, [draft.id, mergePlayers]);
 
   const handleJoin = useCallback(
     async (data: { name: string; password: string }) => {
@@ -358,7 +457,9 @@ export function useDraft(draft: Draft) {
         setError('User is not hosting');
         return;
       }
-      const shuffledPlayers = [...players].sort(() => 0.5 - Math.random());
+      // Shift players by one position in a circular manner
+      const shuffledPlayers =
+        players.length > 0 ? [...players.slice(1), players[0]] : [...players];
       const clearedPlayers = shuffledPlayers.map((player) => ({
         ...player,
         locked: undefined,
@@ -440,7 +541,9 @@ export function useDraft(draft: Draft) {
           ? [
               ...user.loser_banned,
               { id: user.locked!.id, amount: draft.params.loser_bans },
-            ]
+            ].filter((loser_banned) => {
+              return loser_banned.amount > 0;
+            })
           : player.loser_banned
               .map((loser_banned) => {
                 return { id: loser_banned.id, amount: loser_banned.amount - 1 };
@@ -564,7 +667,7 @@ export function useDraft(draft: Draft) {
         setError(err instanceof Error ? err.message : 'Failed to set color');
       }
     },
-    [user, players, prepareNextPlayer, handleSkip, notifyPlayers]
+    [draft, user, players, prepareNextPlayer, handleSkip, notifyPlayers]
   );
 
   return {

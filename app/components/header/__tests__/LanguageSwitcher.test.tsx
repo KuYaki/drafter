@@ -53,12 +53,15 @@ describe('LanguageSwitcher', () => {
 
     // Options should appear after opening the dropdown
     const items = container.querySelectorAll('.ui.dropdown .menu .item');
-    expect(items).toHaveLength(3);
+    expect(items).toHaveLength(6);
 
     const texts = Array.from(items).map((item) => item.textContent);
     expect(texts).toContain('ES');
     expect(texts).toContain('EN');
     expect(texts).toContain('RU');
+    expect(texts).toContain('KM');
+    expect(texts).toContain('NL');
+    expect(texts).toContain('UK');
   });
 
   it('handles language change', async () => {
