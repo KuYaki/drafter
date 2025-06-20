@@ -156,6 +156,7 @@ export default function DraftCreateModal({
               onChange={handleChange}
               placeholder={t('enterName')}
               required
+              autoFocus
             />
             <Form.Input
               label={t('password')}
@@ -186,6 +187,9 @@ export default function DraftCreateModal({
                 max="10"
                 value={formData.params.random}
                 onChange={handleParamChange}
+                onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.select();
+                }}
               />
               <Form.Input
                 label={t('bans')}
@@ -195,6 +199,9 @@ export default function DraftCreateModal({
                 max="10"
                 value={formData.params.bans}
                 onChange={handleParamChange}
+                onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.select();
+                }}
               />
             </Form.Group>
 
@@ -207,6 +214,9 @@ export default function DraftCreateModal({
                 max="10"
                 value={formData.params.loser_bans}
                 onChange={handleParamChange}
+                onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.select();
+                }}
               />
               <Form.Input
                 label={t('repick')}
@@ -216,6 +226,9 @@ export default function DraftCreateModal({
                 max="10"
                 value={formData.params.repick}
                 onChange={handleParamChange}
+                onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.select();
+                }}
               />
             </Form.Group>
 

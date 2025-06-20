@@ -165,6 +165,7 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
                 e.stopPropagation();
                 setIsDeleteModalOpen(true);
               }}
+              style={{ margin: 0 }}
             />
           </div>
         </Card.Content>
