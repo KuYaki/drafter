@@ -30,6 +30,7 @@
     "random": "Willekeurig",
     "bans": "Bans",
     "loserBans": "Verliezer bans",
+    "loserSlots": "Minder keuzes",
     "repick": "Opnieuw kiezen",
     "confirmDelete": "Concept verwijderen",
     "deleteWarning": "Weet je zeker dat je concept {name} wilt verwijderen?",
@@ -125,6 +126,7 @@
     "skipped": "Overgeslagen",
     "loserBanned": "Verloren",
     "available": "Beschikbaar",
-    "banned": "Verbannen"
+    "banned": "Verbannen",
+    "loserSlots": "Slots in verbod"
   }
 }

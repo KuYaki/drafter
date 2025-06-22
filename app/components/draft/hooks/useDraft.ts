@@ -184,8 +184,7 @@ export function useDraft(draft: Draft) {
       const newPlayers = currentPlayers.map((player) => {
         const draftAmount = Math.max(
           1,
-          draft.params.random -
-            player.loser_banned.reduce((sum, item) => sum + item.amount, 0)
+          draft.params.random - player.loser_slots
         );
         var available: CharacterId[] = [];
         var notBannedCharacters = randomCharacterIds.filter(
@@ -394,6 +393,7 @@ export function useDraft(draft: Draft) {
           )[0],
           banned: [],
           loser_banned: [],
+          loser_slots: 0,
           skipped: [],
           available: [],
           state: players.length > 0 ? 'waiting' : 'hosting',
@@ -462,7 +462,7 @@ export function useDraft(draft: Draft) {
         players.length > 0 ? [...players.slice(1), players[0]] : [...players];
       const clearedPlayers = shuffledPlayers.map((player) => ({
         ...player,
-        locked: undefined,
+        locked: null,
         banned: [],
         skipped: [],
         available: [],
@@ -551,9 +551,17 @@ export function useDraft(draft: Draft) {
               .filter((loser_banned) => {
                 return loser_banned.amount > 0;
               });
+      const loser_slots =
+        player.id === user.id
+          ? Math.min(
+              draft.params.random,
+              player.loser_slots + draft.params.loser_slots
+            )
+          : Math.max(0, player.loser_slots - 1);
       const newPlayer: Player = {
         ...player,
         loser_banned,
+        loser_slots,
       };
       return newPlayer;
     });

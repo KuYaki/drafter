@@ -7,6 +7,7 @@ export const DraftParamsSchema = z.object({
   random: z.number(),
   bans: z.number(),
   loser_bans: z.number(),
+  loser_slots: z.number(),
   repick: z.number(),
 });
 

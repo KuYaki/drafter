@@ -30,6 +30,7 @@
     "random": "Aleatorio",
     "bans": "Bans",
     "loserBans": "Bans perdedores",
+    "loserSlots": "Opciones disminuidas",
     "repick": "Reelegir",
     "confirmDelete": "Eliminar borrador",
     "deleteWarning": "¿Estás seguro de que quieres eliminar el borrador {name}?",
@@ -125,6 +126,7 @@
     "skipped": "Saltado",
     "loserBanned": "Derrotado",
     "available": "Disponible",
-    "banned": "Baneado"
+    "banned": "Baneado",
+    "loserSlots": "Slots en ban"
   }
 }

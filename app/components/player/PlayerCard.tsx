@@ -8,6 +8,7 @@ import {
   LabelDetail,
   Dropdown,
   Icon,
+  Popup,
 } from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
 import { colors, PlayerColor, type Player } from '@/types/player';
@@ -42,7 +43,8 @@ export default function PlayerCard({
     player.banned.length > 0 ||
     player.available.length > 0 ||
     player.skipped.length > 0 ||
-    player.loser_banned.length > 0;
+    player.loser_banned.length > 0 ||
+    player.loser_slots > 0;
 
   return (
     <>
@@ -208,9 +210,29 @@ export default function PlayerCard({
                   })}
                 </div>
               ) : null}
-              {player.loser_banned.length > 0 ? (
+              {player.loser_banned.length > 0 || player.loser_slots > 0 ? (
                 <div>
-                  {tp('loserBanned')}:
+                  {tp('loserBanned')}
+                  {player.loser_slots > 0 ? (
+                    <Popup
+                      content={tp('loserSlots') + ': ' + player.loser_slots}
+                      position="top center"
+                      trigger={
+                        <Button
+                          compact
+                          content={'✯ ' + player.loser_slots}
+                          basic
+                          color="violet"
+                          style={{
+                            marginRight: '0.1rem',
+                            marginLeft: '0.3rem',
+                            padding: '0.3rem 0.5rem',
+                          }}
+                        />
+                      }
+                    />
+                  ) : null}
+                  {player.loser_banned.length > 0 ? ':' : null}
                   {player.loser_banned.map((character) => {
                     return (
                       <Label

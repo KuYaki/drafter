@@ -32,7 +32,8 @@ export const PlayerSchema = z.object({
   color: PlayerColorSchema,
   banned: z.array(CharacterIdSchema),
   loser_banned: z.array(PlayerCharacterSchema),
-  locked: PlayerCharacterSchema.optional(),
+  loser_slots: z.number(),
+  locked: PlayerCharacterSchema.nullable().optional(),
   skipped: z.array(PlayerCharacterSchema),
   available: z.array(CharacterIdSchema),
   state: z.enum([

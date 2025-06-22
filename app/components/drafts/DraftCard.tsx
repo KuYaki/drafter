@@ -136,6 +136,14 @@ export default function DraftCard({ draft, onDelete }: DraftCardProps) {
                 </LabelDetail>
               </Label>
             ) : null}
+            {draft.params.loser_slots ? (
+              <Label color="violet" style={{ margin: '0.2rem' }}>
+                {t('loserSlots')}
+                <LabelDetail style={{ whiteSpace: 'nowrap' }}>
+                  {'✯ ' + draft.params.loser_slots}
+                </LabelDetail>
+              </Label>
+            ) : null}
             {draft.params.repick ? (
               <Label color="green" style={{ margin: '0.2rem' }}>
                 {t('repick')}

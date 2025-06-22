@@ -25,6 +25,7 @@ interface DraftCreateModalProps {
       random: number;
       bans: number;
       loser_bans: number;
+      loser_slots: number;
       repick: number;
     };
   }) => Promise<{ success: boolean; error?: string }>;
@@ -49,6 +50,7 @@ export default function DraftCreateModal({
       random: 0,
       bans: 0,
       loser_bans: 0,
+      loser_slots: 0,
       repick: 0,
     },
   });
@@ -106,6 +108,7 @@ export default function DraftCreateModal({
             random: 0,
             bans: 0,
             loser_bans: 0,
+            loser_slots: 0,
             repick: 0,
           },
         });
@@ -219,6 +222,21 @@ export default function DraftCreateModal({
                 }}
               />
               <Form.Input
+                label={t('loserSlots')}
+                name="loser_slots"
+                type="number"
+                min="0"
+                max="10"
+                value={formData.params.loser_slots}
+                onChange={handleParamChange}
+                onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+                  e.target.select();
+                }}
+              />
+            </Form.Group>
+
+            <Form.Group widths="equal">
+              <Form.Input
                 label={t('repick')}
                 name="repick"
                 type="number"
@@ -230,6 +248,7 @@ export default function DraftCreateModal({
                   e.target.select();
                 }}
               />
+              <Form.Field />
             </Form.Group>
 
             {formError && (

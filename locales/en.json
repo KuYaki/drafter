@@ -30,6 +30,7 @@
     "random": "Random",
     "bans": "Bans",
     "loserBans": "Loser Bans",
+    "loserSlots": "Choices decrease",
     "repick": "Repick",
     "confirmDelete": "Delete Draft",
     "deleteWarning": "Are you sure you want to delete draft {name}?",
@@ -125,6 +126,7 @@
     "skipped": "Skipped",
     "loserBanned": "Losed",
     "available": "Available",
-    "banned": "Banned"
+    "banned": "Banned",
+    "loserSlots": "Slots in ban"
   }
 }

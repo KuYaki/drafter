@@ -30,6 +30,7 @@
     "random": "Рандом",
     "bans": "Баны",
     "loserBans": "Баны проигравших",
+    "loserSlots": "Уменьшение выбора",
     "repick": "Перевыбор",
     "confirmDelete": "Удаление драфта",
     "deleteWarning": "Вы уверены, что хотите удалить драфт {name}?",
@@ -125,6 +126,7 @@
     "skipped": "Скипнул",
     "loserBanned": "Поражение",
     "available": "Доступно",
-    "banned": "Забанил"
+    "banned": "Забанил",
+    "loserSlots": "Слоты в бане"
   }
 }
