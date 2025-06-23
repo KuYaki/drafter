@@ -5,6 +5,15 @@ import { Player } from '@/types/player';
 import { Character, characterIdsCoe5 } from '@/types/character';
 import { Draft } from '@/types/draft';
 
+const societies = [
+  'dark',
+  'agricultural',
+  'empire',
+  'fallen',
+  'monarchy',
+  'dawn',
+] as const;
+
 export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
   const [error] = useState<string | null>(null);
   const [characters, setCharacters] = useState<Character[]>(
@@ -16,6 +25,47 @@ export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
       disabled: true,
     }))
   );
+  const [society, setSociety] = useState<string | null>(null);
+
+  const calculateSociety = (seed?: number[]) => {
+    // If no previous values, use a default seed
+    if (!seed || seed.length === 0) {
+      return null; // Default to first society if no seed
+    }
+
+    // Calculate all previous society indices based on the seed history
+    const previousIndices: number[] = [];
+
+    // For each seed value, calculate what society index it would produce
+    for (let i = 0; i < seed.length; i++) {
+      // For the first seed, just use the direct mapping
+      if (i === 0) {
+        previousIndices.push(Math.floor(seed[i] * societies.length));
+        continue;
+      }
+
+      // For subsequent seeds, use the previous result to calculate the next one
+      const prevIndex = previousIndices[i - 1];
+      const currentSeed = seed[i];
+
+      // Use a deterministic function based on the current seed and previous index
+      const hashValue = (currentSeed * 9301 + prevIndex * 49297) % 233280;
+      const normalizedHash = hashValue / 233280;
+
+      // Generate all possible indices except the previous one
+      const possibleIndices = Array.from(
+        { length: societies.length - 1 },
+        (_, j) => (j >= prevIndex ? j + 1 : j)
+      );
+
+      // Select deterministically
+      const nextIndex =
+        possibleIndices[Math.floor(normalizedHash * possibleIndices.length)];
+      previousIndices.push(nextIndex);
+    }
+
+    return societies[previousIndices[previousIndices.length - 1]];
+  };
 
   useEffect(() => {
     const updatedCharacters = characters.map((character) => {
@@ -98,11 +148,13 @@ export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
       };
     });
     setCharacters(updatedCharacters);
+    setSociety(calculateSociety(user?.seed));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draft, user, players]);
 
   return {
     characters,
+    society,
     error,
   };
 }

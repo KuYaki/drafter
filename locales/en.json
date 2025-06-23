@@ -1,5 +1,6 @@
 {
   "common": {
+    "backToTop": "Back to top",
     "open": "Open",
     "delete": "Delete",
     "cancel": "Cancel",
@@ -104,6 +105,16 @@
     "civ6": {
       "ekaterina": "Ekaterina",
       "makedonsky": "Makedonsky"
+    }
+  },
+  "meta": {
+    "coe5": {
+      "dark": "Dark Ages (1)",
+      "agricultural": "Agricultural (2)",
+      "empire": "Empire (3)",
+      "fallen": "Fallen Empire (4)",
+      "monarchy": "Monarchy (5)",
+      "dawn": "Dawn of a New Empire (6)"
     }
   },
   "players": {

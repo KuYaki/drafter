@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Container, Divider, Header } from 'semantic-ui-react';
+import { Button, Container, Divider, Header, Image } from 'semantic-ui-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from '@/lib/theme/ThemeContext';
 import { Draft } from '@/types/draft';
@@ -16,6 +16,7 @@ interface DraftViewCoe5Props {
 
 export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
   const tc = useTranslations('characters.common');
+  const tm = useTranslations('meta.coe5');
   const { isDark } = useTheme();
   const {
     players,
@@ -32,7 +33,11 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
     handleSkip,
     handleLose,
   } = useDraft(draft);
-  const { characters, error: characterError } = useCoe5(players, user, draft);
+  const {
+    characters,
+    society,
+    error: characterError,
+  } = useCoe5(players, user, draft);
 
   const handleCharacterClick = (characterId: CharacterId) => {
     if (user?.state === 'choosing') {
@@ -61,9 +66,22 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
       />
       <Divider />
       <div className="flex justify-between items-center gap-[1rem] m-[1rem]">
-        <Header inverted={isDark} style={{ margin: 0 }}>
-          {tc('characters')}
-        </Header>
+        <div className="flex flex-wrap items-center gap-x-12 gap-y-1">
+          <Header compact inverted={isDark} style={{ margin: 0 }}>
+            {tc('characters')}
+          </Header>
+          {society && (
+            <div className="flex items-center gap-[1rem]">
+              <Image
+                src={`/images/games/coe5/society/${society}.png`}
+                style={{ height: '2rem' }}
+              />
+              <Header size="small" inverted={isDark} style={{ margin: 0 }}>
+                {tm(society)}
+              </Header>
+            </div>
+          )}
+        </div>
         {players?.some((player) => player.state === 'hosting') && (
           <Button
             onClick={() =>

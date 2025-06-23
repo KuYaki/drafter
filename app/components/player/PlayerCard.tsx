@@ -36,6 +36,13 @@ export default function PlayerCard({
   const handleColorChange = (value: PlayerColor) => {
     onColorChange({ playerId: player.id, color: value });
   };
+  
+  const scrollToCharacter = (characterId: string) => {
+    const element = document.getElementById(`character-${characterId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
 
   const editable = player.id === userId;
 
@@ -165,7 +172,8 @@ export default function PlayerCard({
                       <Label
                         key={character}
                         color="red"
-                        style={{ margin: '0.2rem' }}
+                        style={{ margin: '0.2rem', cursor: 'pointer' }}
+                        onClick={() => scrollToCharacter(character)}
                       >
                         {t(`${gameId}.${character}`)}
                       </Label>
@@ -181,7 +189,8 @@ export default function PlayerCard({
                       <Label
                         key={character}
                         color="orange"
-                        style={{ margin: '0.2rem' }}
+                        style={{ margin: '0.2rem', cursor: 'pointer' }}
+                        onClick={() => scrollToCharacter(character)}
                       >
                         {t(`${gameId}.${character}`)}
                       </Label>
@@ -197,7 +206,8 @@ export default function PlayerCard({
                       <Label
                         key={character.id}
                         color="blue"
-                        style={{ margin: '0.2rem' }}
+                        style={{ margin: '0.2rem', cursor: 'pointer' }}
+                        onClick={() => scrollToCharacter(character.id)}
                       >
                         {t(`${gameId}.${character.id}`)}
                         {character.amount && (
@@ -238,7 +248,8 @@ export default function PlayerCard({
                       <Label
                         key={character.id}
                         color="brown"
-                        style={{ margin: '0.2rem' }}
+                        style={{ margin: '0.2rem', cursor: 'pointer' }}
+                        onClick={() => scrollToCharacter(character.id)}
                       >
                         {t(`${gameId}.${character.id}`)}
                         {character.amount && (

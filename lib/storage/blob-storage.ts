@@ -146,7 +146,7 @@ export async function getPlayersFromBlobByDraftId(
     });
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch draft: ${response.status} ${response.statusText}`
+        `Failed to fetch players for draft ${draftId}: ${response.status} ${response.statusText}`
       );
     }
 
@@ -154,7 +154,10 @@ export async function getPlayersFromBlobByDraftId(
     const players = await response.json();
     return players as Player[];
   } catch (error) {
-    console.error(`Error getting draft ${draftId} from Blob Storage:`, error);
+    console.error(
+      `Error getting players for draft ${draftId} from Blob Storage:`,
+      error
+    );
     return [];
   }
 }

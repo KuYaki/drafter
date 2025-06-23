@@ -46,4 +46,5 @@ export const PlayerSchema = z.object({
     'waiting',
   ]),
   disabled: z.boolean(),
+  seed: z.array(z.number()).optional(),
 });

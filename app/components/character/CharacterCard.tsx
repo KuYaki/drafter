@@ -76,6 +76,7 @@ export default function CharacterCard({
   return (
     <>
       <Card
+        id={`character-${character.id}`}
         disabled={character.disabled}
         style={{ overflow: 'hidden', opacity: character.disabled ? 0.6 : 1 }}
         link={character.disabled ? false : true}

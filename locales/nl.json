@@ -1,5 +1,6 @@
 {
   "common": {
+    "backToTop": "Naar boven gaan",
     "open": "Openen",
     "delete": "Verwijderen",
     "cancel": "Annuleren",
@@ -104,6 +105,16 @@
     "civ6": {
       "ekaterina": "Ekaterina",
       "makedonsky": "Makedonsky"
+    }
+  },
+  "meta": {
+    "coe5": {
+      "dark": "Donkere Eeuwen (1)",
+      "agricultural": "Agrarisch Tijdperk (2)",
+      "empire": "Keizerrijk (3)",
+      "fallen": "Gevallen Keizerrijk (4)",
+      "monarchy": "Monarchie (5)",
+      "dawn": "Dageraad van een Nieuw Keizerrijk (6)"
     }
   },
   "players": {

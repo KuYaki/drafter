@@ -398,6 +398,7 @@ export function useDraft(draft: Draft) {
           available: [],
           state: players.length > 0 ? 'waiting' : 'hosting',
           disabled: players.length > 0 ? true : false,
+          seed: players.length > 0 ? players[0].seed : [],
         };
         await notifyPlayers([...players, newPlayer]);
       } catch (err) {
@@ -457,6 +458,11 @@ export function useDraft(draft: Draft) {
         setError('User is not hosting');
         return;
       }
+      const newSeed = user.seed
+        ? user.seed.length > 9
+          ? user.seed.slice(-5).concat(Math.random())
+          : user.seed.concat(Math.random())
+        : [Math.random()];
       // Shift players by one position in a circular manner
       const shuffledPlayers =
         players.length > 0 ? [...players.slice(1), players[0]] : [...players];
@@ -466,6 +472,7 @@ export function useDraft(draft: Draft) {
         banned: [],
         skipped: [],
         available: [],
+        seed: newSeed,
       }));
       const newPlayers =
         draft.params.bans > 0
