@@ -18,7 +18,7 @@ import { getDraftById } from '@/app/actions/draft';
 import { Draft } from '@/types/draft';
 import { useTranslations } from 'next-intl';
 import Cookies from 'js-cookie';
-import BackToTop from '../ui/BackToTop';
+import BackToTop from '@/app/components/shared/ui/BackToTop';
 
 interface DraftLayoutProps {}
 
@@ -154,7 +154,7 @@ export default function DraftLayout({}: DraftLayoutProps) {
           </Button>
         </Modal.Actions>
       </Modal>
-      <BackToTop threshold={200} />
+      <BackToTop threshold={400} />
     </>
   );
 }

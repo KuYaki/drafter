@@ -74,6 +74,7 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
             <div className="flex items-center gap-[1rem]">
               <Image
                 src={`/images/games/coe5/society/${society}.png`}
+                alt={society}
                 style={{ height: '2rem' }}
               />
               <Header size="small" inverted={isDark} style={{ margin: 0 }}>
