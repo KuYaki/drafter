@@ -72,12 +72,7 @@ export default function PlayersList({
         </Header>
         <Button
           content={joinable ? t('join') : t('leave')}
-          disabled={
-            updating ||
-            (joinable &&
-              players.length > 0 &&
-              !players.some((player) => player.state === 'hosting'))
-          }
+          disabled={updating}
           loading={updating}
           primary={joinable}
           basic={!joinable}

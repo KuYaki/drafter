@@ -148,14 +148,14 @@ export function useDraft(draft: Draft) {
   }, []);
 
   const prepareDraft = useCallback((currentPlayers: Player[]) => {
-    const newPlayers = currentPlayers.map((player, id) => {
+    const newPlayers = currentPlayers.map((player) => {
       const newPlayer: Player = {
         ...player,
         banned: [],
         skipped: [],
         available: [],
-        state: id === 0 ? 'hosting' : 'waiting',
-        disabled: id === 0 ? false : true,
+        state: 'hosting',
+        disabled: false,
       };
       return newPlayer;
     });
@@ -363,12 +363,27 @@ export function useDraft(draft: Draft) {
 
   const handleJoin = useCallback(
     async (data: { name: string; password: string }) => {
+      setError(null);
       if (
         players.length > 0 &&
         !players.some((player) => player.state === 'hosting')
       ) {
-        setError('No possible to join during draft in progress');
-        return;
+        const possiblePlayer = players.find(
+          (player) => player.name === data.name
+        );
+        if (possiblePlayer) {
+          if (possiblePlayer.password !== data.password) {
+            setError('Incorrect password');
+            return;
+          }
+          setCurrentUser(possiblePlayer);
+          return;
+        } else {
+          setError(
+            'No possible to join for new players during draft in progress'
+          );
+          return;
+        }
       }
       Cookies.set('user_name', data.name, { expires: 30 }); // Expires in 7 days
       Cookies.set('user_password', data.password, { expires: 30 }); // Expires in 7 days
@@ -405,10 +420,11 @@ export function useDraft(draft: Draft) {
         setError(err instanceof Error ? err.message : 'Failed to join draft');
       }
     },
-    [players, notifyPlayers]
+    [players, notifyPlayers, setCurrentUser]
   );
 
   const handleLeave = useCallback(async () => {
+    setError(null);
     if (!user) {
       setError('User not joined');
       return;
@@ -426,6 +442,7 @@ export function useDraft(draft: Draft) {
 
   const handleSetColor = useCallback(
     async (data: { color: PlayerColor }) => {
+      setError(null);
       if (!user) {
         setError('User not joined');
         return;
@@ -450,6 +467,7 @@ export function useDraft(draft: Draft) {
 
   const handleStart = useCallback(
     async (characterIds: CharacterId[]) => {
+      setError(null);
       if (!user) {
         setError('User not joined');
         return;
@@ -488,6 +506,7 @@ export function useDraft(draft: Draft) {
   );
 
   const handleSkip = useCallback(async () => {
+    setError(null);
     if (!user) {
       setError('User not joined');
       return;
@@ -534,6 +553,7 @@ export function useDraft(draft: Draft) {
   }, [user, players, startGame, prepareNextPlayer, notifyPlayers]);
 
   const handleLose = useCallback(async () => {
+    setError(null);
     if (!user) {
       setError('User not joined');
       return;
@@ -582,6 +602,7 @@ export function useDraft(draft: Draft) {
 
   const handleBan = useCallback(
     async (data: { characterId: CharacterId; characterIds: CharacterId[] }) => {
+      setError(null);
       if (!user) {
         setError('User not joined');
         return;
@@ -619,6 +640,7 @@ export function useDraft(draft: Draft) {
 
   const handlePick = useCallback(
     async (data: { characterId: CharacterId }) => {
+      setError(null);
       if (!user) {
         setError('User not joined');
         return;

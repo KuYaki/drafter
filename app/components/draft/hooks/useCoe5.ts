@@ -148,7 +148,9 @@ export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
       };
     });
     setCharacters(updatedCharacters);
-    setSociety(calculateSociety(user?.seed));
+    setSociety(
+      calculateSociety(players.length > 0 ? players[0].seed : undefined)
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draft, user, players]);
 
