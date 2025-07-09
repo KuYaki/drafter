@@ -477,8 +477,8 @@ export function useDraft(draft: Draft) {
         return;
       }
       const newSeed = user.seed
-        ? user.seed.length > 9
-          ? user.seed.slice(-5).concat(Math.random())
+        ? user.seed.length > 19
+          ? user.seed.slice(-10).concat(Math.random())
           : user.seed.concat(Math.random())
         : [Math.random()];
       // Shift players by one position in a circular manner
