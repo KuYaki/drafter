@@ -38,19 +38,15 @@ export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
 
     // For each seed value, calculate what society index it would produce
     for (let i = 0; i < seed.length; i++) {
+      const currentSeed = seed[i];
+
       // For the first seed, just use the direct mapping
       if (i === 0) {
-        previousIndices.push(Math.floor(seed[i] * societies.length));
+        previousIndices.push(Math.floor(currentSeed * societies.length));
         continue;
       }
 
-      // For subsequent seeds, use the previous result to calculate the next one
       const prevIndex = previousIndices[i - 1];
-      const currentSeed = seed[i];
-
-      // Use a deterministic function based on the current seed and previous index
-      const hashValue = (currentSeed * 9301 + prevIndex * 49297) % 233280;
-      const normalizedHash = hashValue / 233280;
 
       // Generate all possible indices except the previous one
       const possibleIndices = Array.from(
@@ -60,7 +56,7 @@ export function useCoe5(players: Player[], user: Player | null, draft: Draft) {
 
       // Select deterministically
       const nextIndex =
-        possibleIndices[Math.floor(normalizedHash * possibleIndices.length)];
+        possibleIndices[Math.floor(currentSeed * possibleIndices.length)];
       previousIndices.push(nextIndex);
     }
 
