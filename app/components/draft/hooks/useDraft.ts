@@ -630,7 +630,7 @@ export function useDraft(draft: Draft) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start draft');
     }
-  }, [draft, user, players, prepareDraft, notifyPlayers]);
+  }, [user, players, prepareDraft, notifyPlayers]);
 
   const handleBan = useCallback(
     async (data: { characterId: CharacterId; characterIds: CharacterId[] }) => {
