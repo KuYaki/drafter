@@ -36,7 +36,7 @@ export default function PlayerCard({
   const handleColorChange = (value: PlayerColor) => {
     onColorChange({ playerId: player.id, color: value });
   };
-  
+
   const scrollToCharacter = (characterId: string) => {
     const element = document.getElementById(`character-${characterId}`);
     if (element) {
@@ -158,6 +158,8 @@ export default function PlayerCard({
                   ? 'grey'
                   : player.state === 'locked'
                   ? 'blue'
+                  : player.state === 'draw'
+                  ? 'purple'
                   : 'green'
               }
             />

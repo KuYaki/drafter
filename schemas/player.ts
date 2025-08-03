@@ -44,6 +44,7 @@ export const PlayerSchema = z.object({
     'ready',
     'playing',
     'waiting',
+    'draw',
   ]),
   disabled: z.boolean(),
   seed: z.array(z.number()).optional(),

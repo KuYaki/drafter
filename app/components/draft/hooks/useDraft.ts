@@ -600,6 +600,38 @@ export function useDraft(draft: Draft) {
     }
   }, [draft, user, players, prepareDraft, notifyPlayers]);
 
+  const handleDraw = useCallback(async () => {
+    setError(null);
+    if (!user) {
+      setError('User not joined');
+      return;
+    }
+    if (!user.locked) {
+      setError('Leader not chosen');
+      return;
+    }
+    const loseCountedPlayers: Player[] = players.map((player) => {
+      const newPlayer: Player =
+        player.id === user.id
+          ? {
+              ...player,
+              state: 'draw',
+            }
+          : player;
+      return newPlayer;
+    });
+    const newPlayers = loseCountedPlayers.every(
+      (player) => player.state === 'draw'
+    )
+      ? prepareDraft(loseCountedPlayers)
+      : loseCountedPlayers;
+    try {
+      await notifyPlayers(newPlayers);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start draft');
+    }
+  }, [draft, user, players, prepareDraft, notifyPlayers]);
+
   const handleBan = useCallback(
     async (data: { characterId: CharacterId; characterIds: CharacterId[] }) => {
       setError(null);
@@ -721,6 +753,7 @@ export function useDraft(draft: Draft) {
     handlePick,
     handleSkip,
     handleLose,
+    handleDraw,
   };
 }
 

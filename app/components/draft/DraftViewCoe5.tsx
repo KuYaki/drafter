@@ -32,6 +32,7 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
     handlePick,
     handleSkip,
     handleLose,
+    handleDraw,
   } = useDraft(draft);
   const {
     characters,
@@ -67,7 +68,7 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
       <Divider />
       <div className="flex justify-between items-center gap-[1rem] m-[1rem]">
         <div className="flex flex-wrap items-center gap-x-12 gap-y-1">
-          <Header compact inverted={isDark} style={{ margin: 0 }}>
+          <Header inverted={isDark} style={{ margin: 0 }}>
             {tc('characters')}
           </Header>
           {society && (
@@ -100,6 +101,14 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
             disabled={user?.state !== 'choosing' || user.locked === undefined}
             content={tc('skip')}
             color="blue"
+          />
+        )}
+        {players?.some((player) => player.state === 'playing') && (
+          <Button
+            onClick={() => user?.state === 'playing' && handleDraw()}
+            disabled={user?.state !== 'playing'}
+            content={tc('draw')}
+            color="purple"
           />
         )}
         {players?.some((player) => player.state === 'playing') && (
