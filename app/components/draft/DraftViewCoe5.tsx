@@ -105,16 +105,22 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
         )}
         {players?.some((player) => player.state === 'playing') && (
           <Button
-            onClick={() => user?.state === 'playing' && handleDraw()}
-            disabled={user?.state !== 'playing'}
+            onClick={() =>
+              (user?.state === 'playing' || user?.state === 'draw') &&
+              handleDraw()
+            }
+            disabled={user?.state !== 'playing' && user?.state !== 'draw'}
             content={tc('draw')}
             color="purple"
           />
         )}
         {players?.some((player) => player.state === 'playing') && (
           <Button
-            onClick={() => user?.state === 'playing' && handleLose()}
-            disabled={user?.state !== 'playing'}
+            onClick={() =>
+              (user?.state === 'playing' || user?.state === 'draw') &&
+              handleLose()
+            }
+            disabled={user?.state !== 'playing' && user?.state !== 'draw'}
             content={tc('lose')}
             color="red"
           />

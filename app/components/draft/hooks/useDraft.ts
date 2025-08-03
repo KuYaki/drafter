@@ -615,7 +615,7 @@ export function useDraft(draft: Draft) {
         player.id === user.id
           ? {
               ...player,
-              state: 'draw',
+              state: player.state === 'draw' ? 'playing' : 'draw',
             }
           : player;
       return newPlayer;
