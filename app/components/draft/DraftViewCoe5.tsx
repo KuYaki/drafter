@@ -111,7 +111,10 @@ export default function DraftViewCoe5({ draft }: DraftViewCoe5Props) {
             }
             disabled={user?.state !== 'playing' && user?.state !== 'draw'}
             content={tc('draw')}
-            color="purple"
+            basic
+            color={user?.state === 'draw' ? 'grey' : 'purple'}
+            icon={user?.state === 'draw' ? 'check' : 'question'}
+            labelPosition="right"
           />
         )}
         {players?.some((player) => player.state === 'playing') && (
